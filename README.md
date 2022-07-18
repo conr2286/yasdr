@@ -4,9 +4,9 @@ Yasdx is yet another software defined transceiver inspired by the SDX thread.  T
 ### Roadmap
 * Investigate technology decisions to pivot away from the ATmega318 processor limitations
 * Prototype the receiver's DSP signal flow using gnuradio
-* Implement hardware drawing inspiration from the uSDX-x project
-* Implement firmware (fw) for a simple receiver
-* Receiver enhancements
+* Implement the hardware drawing inspiration from the uSDX-x project
+* Implement the firmware (fw) for a minimal receiver
+* Receiver enhancements (AGC, filters, noise reduction, RIT, and related goodies)
 * Transmitter
 * Activate an Idaho SOTA peak 
 
