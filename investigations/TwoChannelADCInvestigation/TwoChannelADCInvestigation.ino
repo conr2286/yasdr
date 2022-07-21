@@ -1,7 +1,7 @@
 /*
    @FILE Investigate use of interrupts with a two channel Analog to Digital Converter (ADC)
 
-   Objectives:  Sample two analog channels (named I and Q) using the same periodic sample function
+   Objectives:  Sample two analog signals (named, I and Q) using a periodic sample function
 
    Resources:  Two analog input pins
 
