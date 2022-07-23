@@ -59,6 +59,18 @@ blocks:
     coordinate: [96, 104.0]
     rotation: 0
     state: true
+- name: nTaps
+  id: variable
+  parameters:
+    comment: ''
+    value: '11'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [168, 144.0]
+    rotation: 0
+    state: true
 - name: samp_rate
   id: variable
   parameters:
@@ -111,7 +123,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [216, 44.0]
+    coordinate: [64, 380.0]
     rotation: 0
     state: true
 - name: audio_sink_0
@@ -178,7 +190,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [360, 52.0]
+    coordinate: [272, 388.0]
     rotation: 0
     state: true
 - name: blocks_complex_to_imag_0
@@ -307,6 +319,22 @@ blocks:
     coordinate: [576, 388.0]
     rotation: 0
     state: true
+- name: filter_delay_fc_0
+  id: filter_delay_fc
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    taps: nTaps
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [672, 52.0]
+    rotation: 0
+    state: true
 - name: freq_xlating_fir_filter_xxx_0
   id: freq_xlating_fir_filter_xxx
   parameters:
@@ -336,31 +364,13 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    num_taps: '65'
+    num_taps: nTaps
     win: window.WIN_HAMMING
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
     coordinate: [672, 404.0]
-    rotation: 0
-    state: true
-- name: hilbert_fc_1
-  id: hilbert_fc
-  parameters:
-    affinity: ''
-    alias: ''
-    beta: '6.76'
-    comment: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    num_taps: '65'
-    win: window.WIN_HAMMING
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [664, 68.0]
     rotation: 0
     state: true
 - name: note_0
@@ -386,7 +396,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [664, 112.0]
+    coordinate: [672, 136.0]
     rotation: 0
     state: true
 - name: note_2
@@ -415,11 +425,11 @@ connections:
 - [blocks_file_source_0, '0', freq_xlating_fir_filter_xxx_0, '0']
 - [blocks_multiply_const_vxx_0, '0', audio_sink_0, '0']
 - [blocks_multiply_const_vxx_1, '0', blocks_multiply_xx_1, '1']
-- [blocks_multiply_xx_0, '0', hilbert_fc_1, '0']
+- [blocks_multiply_xx_0, '0', filter_delay_fc_0, '0']
 - [blocks_multiply_xx_1, '0', hilbert_fc_0, '0']
+- [filter_delay_fc_0, '0', blocks_complex_to_real_1, '0']
 - [freq_xlating_fir_filter_xxx_0, '0', blocks_complex_to_float_0, '0']
 - [hilbert_fc_0, '0', blocks_complex_to_imag_0, '0']
-- [hilbert_fc_1, '0', blocks_complex_to_real_1, '0']
 
 metadata:
   file_format: 1

@@ -82,6 +82,7 @@ class PhasingSSBReceiver(gr.top_block, Qt.QWidget):
         self.samp_rate = samp_rate = 256000
         self.audio_rate = audio_rate = 32000
         self.volume = volume = 0.00001
+        self.nTaps = nTaps = 11
         self.decim = decim = (int)(samp_rate/audio_rate)
 
         ##################################################
@@ -90,9 +91,9 @@ class PhasingSSBReceiver(gr.top_block, Qt.QWidget):
         self._volume_range = Range(0.0, 0.001, 0.00001, 0.00001, 200)
         self._volume_win = RangeWidget(self._volume_range, self.set_volume, "'volume'", "counter_slider", float, QtCore.Qt.Horizontal)
         self.top_layout.addWidget(self._volume_win)
-        self.hilbert_fc_1 = filter.hilbert_fc(65, window.WIN_HAMMING, 6.76)
-        self.hilbert_fc_0 = filter.hilbert_fc(65, window.WIN_HAMMING, 6.76)
+        self.hilbert_fc_0 = filter.hilbert_fc(nTaps, window.WIN_HAMMING, 6.76)
         self.freq_xlating_fir_filter_xxx_0 = filter.freq_xlating_fir_filter_ccc(decim, firdes.low_pass(1.0,samp_rate,3000,100), 50000, samp_rate)
+        self.filter_delay_fc_0 = filter.filter_delay_fc([nTaps])
         self.blocks_multiply_xx_1 = blocks.multiply_vff(1)
         self.blocks_multiply_xx_0 = blocks.multiply_vff(1)
         self.blocks_multiply_const_vxx_1 = blocks.multiply_const_ff(-1)
@@ -122,11 +123,11 @@ class PhasingSSBReceiver(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_file_source_0, 0), (self.freq_xlating_fir_filter_xxx_0, 0))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.audio_sink_0, 0))
         self.connect((self.blocks_multiply_const_vxx_1, 0), (self.blocks_multiply_xx_1, 1))
-        self.connect((self.blocks_multiply_xx_0, 0), (self.hilbert_fc_1, 0))
+        self.connect((self.blocks_multiply_xx_0, 0), (self.filter_delay_fc_0, 0))
         self.connect((self.blocks_multiply_xx_1, 0), (self.hilbert_fc_0, 0))
+        self.connect((self.filter_delay_fc_0, 0), (self.blocks_complex_to_real_1, 0))
         self.connect((self.freq_xlating_fir_filter_xxx_0, 0), (self.blocks_complex_to_float_0, 0))
         self.connect((self.hilbert_fc_0, 0), (self.blocks_complex_to_imag_0, 0))
-        self.connect((self.hilbert_fc_1, 0), (self.blocks_complex_to_real_1, 0))
 
 
     def closeEvent(self, event):
@@ -159,6 +160,12 @@ class PhasingSSBReceiver(gr.top_block, Qt.QWidget):
     def set_volume(self, volume):
         self.volume = volume
         self.blocks_multiply_const_vxx_0.set_k(self.volume)
+
+    def get_nTaps(self):
+        return self.nTaps
+
+    def set_nTaps(self, nTaps):
+        self.nTaps = nTaps
 
     def get_decim(self):
         return self.decim
