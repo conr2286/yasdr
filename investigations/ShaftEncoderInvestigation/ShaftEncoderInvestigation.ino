@@ -17,19 +17,22 @@
 #define ENCODER_B 3  //ENCODER_B is Arduino Digital 3 (PD3) appearing as Pin 6 on the Arduino card
 
 
-//Build the encoder object
-ShaftEncoder encoder(ENCODER_A, ENCODER_B);
+//Build the ShaftEncoder.  Without interrupts, the encoder's position must be polled *very* rapidly
+//to avoid missing the encoders transitions
+#define INTEN false
+ShaftEncoder encoder(ENCODER_A, ENCODER_B, INTEN);
 
+//ShaftEncoder encoder(ENCODER_A, ENCODER_B, true);
 
 //Initialization
 void setup() {
   Serial.begin(57600);
-  Serial.print("setup()\n");
+  Serial.print("\nsetup()\n");
 }
 
 
 //The main loop, invoked ad infinatum as fast as the Arduino core can do it
 void loop() {
-  Serial.print("\nencoderPosition="); Serial.print(ShaftEncoder::getPosition(),DEC); Serial.print(", nInvalids="); Serial.print(ShaftEncoder::getNInvalids());
-  delay(1000);  //Wait 1000ms before reporting again
+  Serial.print("\nencoderPosition="); Serial.print(ShaftEncoder::getPosition(),DEC);
+  delay(1);  //Even a 1 mS delay can lead to missing transitions w/o interrupts
 }
