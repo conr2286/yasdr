@@ -10,7 +10,8 @@
  *  
  */
 
-#include "ShaftEncoder.h"
+//Install the ShaftEncoder library zip from below the lib folder
+#include <ShaftEncoder.h>
 
 //Define encoder pin connections to the Arduino
 #define ENCODER_A 2  //ENCODER_A is Arduino Digital 2 (PD2) appearing as Pin 5 on the Arduino card

@@ -1,7 +1,6 @@
 /**
-   @file Definitions for the ShaftEncoder  module
+   @file Definitions for all implementations of the ShaftEncoder
 */
-
 
 class ShaftEncoder {
 

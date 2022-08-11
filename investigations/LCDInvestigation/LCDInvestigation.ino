@@ -19,49 +19,17 @@
 */
 
 #include <LiquidCrystal.h>
+#include <ShaftEncoder.h>
 
 //Build the lcd object
 LiquidCrystal lcd(12, 11, 10, 5, 4, 3, 2);
 
+//Build the ShaftEncoder
+ShaftEncoder encoder(6,7,false);    //No interrupts available on arduino digital pins 6 and 7
 
-/*
-   Time the performance of a single feature
-*/
-void timeIt( char *s, void (*theFunction)() ) {
-  unsigned repetitions = 10000;
-  unsigned long t0 = millis();        //Time when exercise begins
-  for (unsigned i = 0; i < repetitions; i++) {
-    theFunction();
-  }
-  unsigned long t1 = millis();        //Time when exercise ends
-  Serial.print("\nTimeIt "); Serial.print(((float)(t1 - t0) / (float)repetitions));
+//Iteration counter
+unsigned long iterationCount;
 
-}
-
-/**
-   exerciseSetCursor
-*/
-unsigned row = 0;
-unsigned col = 0;
-void exerciseSetCursor() {
-  lcd.setCursor(col, row);
-  row = (++row) % 2;
-  col = (++col) % 16;
-}
-
-/**
-   exercisePrint
-*/
-void exercisePrint() {
-  lcd.print("p");
-}
-
-/**
-   exerciseWrite()
-*/
-void exerciseWrite() {
-  lcd.write('w');
-}
 
 /**
    Initialization
@@ -77,14 +45,22 @@ void setup() {
   //Display the starting message on the LCD to exercise the connection
   lcd.begin(16, 2);             //Two rows of sixteen characters each
   lcd.print("Starting!");       //Display the starting message
+  delay(1000);                  //Wait a second
 
-  //Time various LCD functions of interest
-  timeIt((char *)"setCursor", exerciseSetCursor);
-  timeIt((char *)"print", exercisePrint);
-  timeIt((char *)"write", exerciseWrite);
+  //Reset iteration counter
+  iterationCount=0;
 
 }
 
 void loop() {
+
+  //Display shaft encoder's position in first row
+  long x = ShaftEncoder::getPosition();
+  lcd.setCursor(0,0);           //First column, first row
+  lcd.print(x);
+
+  //Display updated iteration count in second row
+  lcd.setCursor(0,1);           //First column, second row
+  lcd.print(++iterationCount);
 
 }

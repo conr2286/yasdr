@@ -20,8 +20,11 @@
    routine doesn't have a reference to "this" object.
 **/
 
+//This implementation of the ShaftEncoder is for AVR architectures
+#ifdef ARDUINO_ARCH_AVR
+
 #include <Arduino.h>
-#include "ShaftEncoder.h"
+#include <ShaftEncoder.h>
 
 
 //Many variables that seemingly should be member variables are static because the ISR must be static
@@ -163,3 +166,5 @@ void ShaftEncoder::setPosition(long p) {
 //unsigned ShaftEncoder::getNInvalids() {
 //  return nInvalids;
 //}
+
+#endif    //ARDUINO_ARCH_AVR
