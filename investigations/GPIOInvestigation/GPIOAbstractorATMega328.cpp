@@ -36,11 +36,10 @@
 #include "GPIOAbstractor.h"
 
 
-
 //Implement the class members for servicing the user's pin change interrupt
 void (*GPIOAbstractor::interruptHandlers[NPORTS][8])();  //The ATMega328P has 8 digital pins in three PORTs
 uint8_t GPIOAbstractor::savedPinStates[NPORTS];          //Saved pin values (for abstracting CHANGE mode)
-uint8_t GPIOAbstractor::pinModes[NPORTS][8];             //Saved pin modes supplied by user
+GPIO_ABSTRACTOR_PINMODE GPIOAbstractor::pinModes[NPORTS][8];             //Saved pin modes supplied by user
 
 //Define the map of digital pin numbers to <port,bit>.  PortB is port#0, PortC is port#1, and PortD is port#2.
 //The least significant bit (LSB) in a port is bit 0.  Bit 7 is the most significant bit (MSB).  The map
@@ -105,7 +104,7 @@ GPIOAbstractor::GPIOAbstractor() {
 /**
   Configures the specified pin for OUTPUT, INPUT or INPUT_PULLUP
 **/
-void GPIOAbstractor::pinMode(uint8_t pin, uint8_t mode) {
+void GPIOAbstractor::pinMode(uint8_t pin, GPIO_ABSTRACTOR_PINMODE mode) {
   ::pinMode(pin, mode);  //We don't add value to this method for the 328
 }
 
@@ -113,7 +112,7 @@ void GPIOAbstractor::pinMode(uint8_t pin, uint8_t mode) {
 /**
   Reads the value of the specified digital pin
 **/
-bool GPIOAbstractor::digitalRead(uint8_t pin) {
+GPIO_ABSTRACTOR_PINSTATUS GPIOAbstractor::digitalRead(uint8_t pin) {
   return ::digitalRead(pin);  //We don't add value to this method for the 328
 }
 
@@ -121,7 +120,7 @@ bool GPIOAbstractor::digitalRead(uint8_t pin) {
 /**
   Reads the value of the specified digital pin
 **/
-void GPIOAbstractor::digitalWrite(uint8_t pin, bool value) {
+void GPIOAbstractor::digitalWrite(uint8_t pin, GPIO_ABSTRACTOR_PINSTATUS value) {
   ::digitalWrite(pin, value);  //We don't add value to this method for the 328
 }
 
@@ -141,7 +140,7 @@ void GPIOAbstractor::digitalWrite(uint8_t pin, bool value) {
   @param intMode Supported modes are RISING, FALLING, CHANGE
 
 **/
-void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), uint8_t intMode) {
+void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABSTRACTOR_PINSTATUS intMode) {
 
   Serial.print("attachInterrupt ");
   Serial.print(digitalPin);

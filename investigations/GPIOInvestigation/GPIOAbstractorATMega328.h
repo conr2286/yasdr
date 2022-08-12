@@ -6,7 +6,14 @@
 
 **/
 
+#pragma once
+
 #define NPORTS (3)  //Number of GPIO ports in the ATMega328 MCU
+
+//This Arduino implementation uses uint8_t for PinMode and PinStatus; others use enumerations.
+//Yes, the data types for these API parameters are MCU dependent.  Really.
+#define GPIO_ABSTRACTOR_PINMODE   uint8_t
+#define GPIO_ABSTRACTOR_PINSTATUS uint8_t
 
 
 //Arrange for the C ISRs to become friends of the GPIOAbstractor class so they may access
@@ -34,7 +41,7 @@ class GPIOAbstractor {
 private:
   static void (*interruptHandlers[][8])();                //User-supplied ISRs for pins of interest to them
   static uint8_t savedPinStates[NPORTS];  //Saved pin values (for abstracting CHANGE mode)
-  static uint8_t pinModes[NPORTS][8];     //Saved pin modes supplied by user
+  static GPIO_ABSTRACTOR_PINMODE pinModes[NPORTS][8];     //Saved pin modes supplied by user
   const static PinMap pinMap[];                           //Maps Arduino digital pin number to <port,bit>
   friend void PCINT0_vect(void);                          //Grant interrupt handlers access to our private class members
   friend void PCINT1_vect(void);
@@ -45,9 +52,9 @@ private:
   //to do that with C++.
 public:
   GPIOAbstractor();
-  static void pinMode(uint8_t pin, uint8_t mode);
-  static bool digitalRead(uint8_t pin);
-  static void digitalWrite(uint8_t pin, bool value);
-  static void attachInterrupt(uint8_t digitalPin, void (*isr)(), uint8_t mode);
+  static void pinMode(uint8_t pin, GPIO_ABSTRACTOR_PINMODE mode);
+  static GPIO_ABSTRACTOR_PINSTATUS digitalRead(uint8_t pin);
+  static void digitalWrite(uint8_t pin, uint8_t value);
+  static void attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABSTRACTOR_PINSTATUS mode);
   static void detachInterrupt(uint8_t digitalPin);
 };

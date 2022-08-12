@@ -43,7 +43,7 @@ GPIOAbstractor::GPIOAbstractor() {
 /**
   Configures the specified pin for OUTPUT, INPUT or INPUT_PULLUP
 **/
-void GPIOAbstractor::pinMode(uint8_t pin, uint8_t mode) {
+void GPIOAbstractor::pinMode(uint8_t pin, GPIO_ABSTRACTOR_PINMODE mode) {
   ::pinMode(pin, mode);  //We don't add value to this method
 }
 
@@ -51,7 +51,7 @@ void GPIOAbstractor::pinMode(uint8_t pin, uint8_t mode) {
 /**
   Reads the value of the specified digital pin
 **/
-bool GPIOAbstractor::digitalRead(uint8_t pin) {
+GPIO_ABSTRACTOR_PINSTATUS GPIOAbstractor::digitalRead(uint8_t pin) {
   return ::digitalRead(pin);  //We don't add value to this method
 }
 
@@ -59,7 +59,7 @@ bool GPIOAbstractor::digitalRead(uint8_t pin) {
 /**
   Reads the value of the specified digital pin
 **/
-void GPIOAbstractor::digitalWrite(uint8_t pin, bool value) {
+void GPIOAbstractor::digitalWrite(uint8_t pin, GPIO_ABSTRACTOR_PINSTATUS value) {
   ::digitalWrite(pin, value);  //We don't add value to this method
 }
 
@@ -79,7 +79,7 @@ void GPIOAbstractor::digitalWrite(uint8_t pin, bool value) {
   @param intMode Supported modes are RISING, FALLING, CHANGE
 
 **/
-void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), uint8_t intMode) {
+void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABSTRACTOR_PINSTATUS intMode) {
 
   Serial.print("attachInterrupt ");
   Serial.print(digitalPin);

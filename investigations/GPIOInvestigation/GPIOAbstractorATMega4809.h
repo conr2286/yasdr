@@ -13,6 +13,13 @@
 
 **/
 
+#pragma once
+
+//This Arduino implementation uses enumerations for PinMode and PinStatus; others use uint8_t
+//Yes, the data types for these API parameters are MCU dependent.  Really.
+#define GPIO_ABSTRACTOR_PINMODE   PinMode
+#define GPIO_ABSTRACTOR_PINSTATUS PinStatus
+
 
 class GPIOAbstractor {
 
@@ -25,9 +32,9 @@ private:
   //to do that with C++.
 public:
   GPIOAbstractor();
-  static void pinMode(uint8_t pin, uint8_t mode);
-  static bool digitalRead(uint8_t pin);
-  static void digitalWrite(uint8_t pin, bool value);
-  static void attachInterrupt(uint8_t digitalPin, void (*isr)(), uint8_t mode);
+  static void pinMode(uint8_t pin, GPIO_ABSTRACTOR_PINMODE mode);
+  static GPIO_ABSTRACTOR_PINSTATUS digitalRead(uint8_t pin);
+  static void digitalWrite(uint8_t pin, GPIO_ABSTRACTOR_PINSTATUS value);
+  static void attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABSTRACTOR_PINSTATUS intMode);
   static void detachInterrupt(uint8_t digitalPin);
 };
