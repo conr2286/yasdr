@@ -9,7 +9,8 @@
   best of all possible worlds, we would place the MCU-independent declarations
   here and the MCU-dependent declarations separately.  If you figure out a
   clean way to do this in C++, perhaps you'll reorganize it that way; until
-  then, all we can really do is abstract the MCU dependencies.
+  then, all we can really do is abstract the MCU dependencies, and avoid
+  polluting the public class interface with device-dependent members.
 
 **/ 
 
@@ -26,4 +27,4 @@
 #endif
 
 
-//Add the #includes for other MCUs' declarations below
+//Add the #includes for additional MCUs' declarations below...

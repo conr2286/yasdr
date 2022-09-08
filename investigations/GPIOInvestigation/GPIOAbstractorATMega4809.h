@@ -15,8 +15,10 @@
 
 #pragma once
 
-//This Arduino implementation uses enumerations for PinMode and PinStatus; others use uint8_t
-//Yes, the data types for these API parameters are MCU dependent.  Really.
+//This Arduino implementation uses enumerations for PinMode and PinStatus; other MCUs use uint8_t.
+//Yes, the data *types* for these API parameters are MCU dependent.  Really.  So we work around
+//the differences by #defining symbols to the respective MCU datatypes in each MCU's device-specific
+//declaration file.
 #define GPIO_ABSTRACTOR_PINMODE   PinMode
 #define GPIO_ABSTRACTOR_PINSTATUS PinStatus
 
@@ -28,8 +30,9 @@ private:
  
 
   //This public section contains device-independent declarations comprising the interface to the GPIOAbstractor.
-  //In the best of all possible worlds, these would reside in GPIOAbstractor.h but I've never found a clean way
-  //to do that with C++.
+  //In the best of all possible worlds, these would reside in the device-independent GPIOAbstractor.h but I've
+  //never found a clean way to do that with C++.  So... please avoid placing device-dependent declarations in
+  //the class's public interface.
 public:
   GPIOAbstractor();
   static void pinMode(uint8_t pin, GPIO_ABSTRACTOR_PINMODE mode);

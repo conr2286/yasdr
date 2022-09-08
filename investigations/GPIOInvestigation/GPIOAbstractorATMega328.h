@@ -11,7 +11,8 @@
 #define NPORTS (3)  //Number of GPIO ports in the ATMega328 MCU
 
 //This Arduino implementation uses uint8_t for PinMode and PinStatus; others use enumerations.
-//Yes, the data types for these API parameters are MCU dependent.  Really.
+//Yes, the data types for these API parameters are MCU dependent.  Really.  We work around
+//the problem using #define'd symbols for the device-dependent data types.
 #define GPIO_ABSTRACTOR_PINMODE   uint8_t
 #define GPIO_ABSTRACTOR_PINSTATUS uint8_t
 
@@ -49,7 +50,7 @@ private:
 
   //This public section contains device-independent declarations comprising the interface to the GPIOAbstractor.
   //In the best of all possible worlds, these would reside in GPIOAbstractor.h but I've never found a clean way
-  //to do that with C++.
+  //to do that with C++.  Please avoid placing device-dependent entries in the public interface.
 public:
   GPIOAbstractor();
   static void pinMode(uint8_t pin, GPIO_ABSTRACTOR_PINMODE mode);

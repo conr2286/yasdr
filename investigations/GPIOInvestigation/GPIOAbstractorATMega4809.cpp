@@ -21,7 +21,7 @@
 **/
 
 
-//Define this implementation's target MCU(s)
+//This implementation targets the MEGA AVR boards, specifically the Arduino Nano Every 
 #ifdef ARDUINO_ARCH_MEGAAVR
 
 #include <Arduino.h>
@@ -87,7 +87,7 @@ void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABS
   Serial.print(intMode);
   Serial.print("\n");
 
-  //Let the Arduino core process this request since it supports interrupts on all Arduino digital pins
+  //Let the Arduino core process this request since it supports interrupts on all ATMega digital pins
   ::attachInterrupt(digitalPinToInterrupt(digitalPin), isr, intMode);
 
 }  //attachInterrupt()
