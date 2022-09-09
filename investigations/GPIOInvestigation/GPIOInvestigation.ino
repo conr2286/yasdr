@@ -13,6 +13,8 @@
 
 #define TEST_PIN 5
 
+extern unsigned nPortB, nPortC, nPortD;
+
 
 typedef unsigned long u32;
 
@@ -36,8 +38,11 @@ void setup() {
 
 void loop() {
   if (millis() >= stopTime) {
-    Serial.println(count);          //#interrupts/second
-    count = 0;
+    Serial.print("count="); Serial.print(count);          //Display count
+    Serial.print(", nPortB="); Serial.print(nPortB);      //Interrupt counts on ports
+    Serial.print(", nPortC="); Serial.print(nPortC);      //Interrupt counts on ports
+    Serial.print(", nPortD="); Serial.println(nPortD);      //Interrupt counts on ports
+    //count = 0;                    //Reset count to see frequency
     stopTime = millis() + 1000L;
   }
 }

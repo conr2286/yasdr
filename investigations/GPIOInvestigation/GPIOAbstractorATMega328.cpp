@@ -29,12 +29,20 @@
 **/
 
 
-//Define this implementation's target MCU(s)
+//Definitions for this implementation's target MCU(s)
 #ifdef ARDUINO_ARCH_AVR
 
 #include <Arduino.h>
 #include "GPIOAbstractor.h"
 
+//Debugging controls and variables
+#define GPIO_DEBUG 
+
+#ifdef GPIO_DEBUG
+unsigned nPortB = 0;
+unsigned nPortC = 0;
+unsigned nPortD = 0;
+#endif
 
 //Implement the class members for servicing the user's pin change interrupt
 void (*GPIOAbstractor::interruptHandlers[NPORTS][8])();  //The ATMega328P has 8 digital pins in three PORTs
@@ -218,6 +226,10 @@ void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABS
 **/
 ISR(PCINT0_vect) {
 
+#ifdef GPIO_DEBUG
+  nPortB++;
+#endif
+
   const uint8_t portX = 0;                                    //Servicing interrupts for PORTB
 
   //Determine which pins' values changed
@@ -266,6 +278,10 @@ ISR(PCINT0_vect) {
 **/
 ISR(PCINT1_vect) {
 
+#ifdef GPIO_DEBUG
+  nPortC++;
+#endif
+
   const uint8_t portX = 1;                                    //Servicing interrupts for PORTC
 
   //Determine which pins' values changed
@@ -311,6 +327,10 @@ ISR(PCINT1_vect) {
   Pin Change Interrupt handler for PORT D)
 **/
 ISR(PCINT2_vect) {
+
+#ifdef GPIO_DEBUG
+  nPortD++;
+#endif
 
   const uint8_t portX = 2;  //Servicing interrupts for PORTD
 
