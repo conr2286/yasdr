@@ -32,6 +32,11 @@ void setup() {
   stopTime = millis() + 1000L;
   Serial.begin(57600);
   Serial.println("\nStarting...");
+
+  //Prevent interrupts asrising from electrical noise on unused pins.
+  for (int i=0; i<23; i++) pinMode(i,INPUT_PULLUP);
+
+  //Configure test pin and attach an interrupt handler for it
   pinMode(TEST_PIN,INPUT_PULLUP);
   gpio.attachInterrupt(TEST_PIN, myISR, RISING);
 }

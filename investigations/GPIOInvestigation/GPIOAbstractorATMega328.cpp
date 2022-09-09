@@ -155,9 +155,9 @@ void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABS
   Serial.print(" ");
   Serial.print(intMode);
   Serial.print("\n");
-  for (int i = 0; i < 24; i++) {
-    Serial.print(i); Serial.print(" = <"); Serial.print(pinMap[i].port); Serial.print(","); Serial.print(pinMap[i].bit); Serial.print(">\n");
-  }
+  //for (int i = 0; i < 24; i++) {
+  //  Serial.print(i); Serial.print(" = <"); Serial.print(pinMap[i].port); Serial.print(","); Serial.print(pinMap[i].bit); Serial.print(">\n");
+  //}
 
 
   //Let the Arduino core process requests for the so-called "external" interrupts as our overhead doesn't add value
@@ -166,7 +166,7 @@ void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABS
   } else {
 
     //Ignore user's requests for modes LOW and HIGH unsupported by ATmega328
-    if (intMode == LOW || intMode == HIGH) return;  //Can't report error consistent with attachInterrupt() function
+    if (intMode == LOW || intMode == HIGH) return;  //Sorry... Can't report error consistent with attachInterrupt() function
 
     //Ignore requests for illegal digital pin numbers
     if (digitalPin > 23) return;
