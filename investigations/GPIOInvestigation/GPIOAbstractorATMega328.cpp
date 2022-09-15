@@ -35,19 +35,19 @@
 #include <Arduino.h>
 #include "GPIOAbstractor.h"
 
-//Debugging controls and variables
-#define GPIO_DEBUG 
+
 
 #ifdef GPIO_DEBUG
-unsigned nPortB = 0;
-unsigned nPortC = 0;
-unsigned nPortD = 0;
+volatile unsigned nPortB = 0;
+volatile unsigned nPortC = 0;
+volatile unsigned nPortD = 0;
 #endif
 
+
 //Implement the class members for servicing the user's pin change interrupt
-void (*GPIOAbstractor::interruptHandlers[NPORTS][8])();  //The ATMega328P has 8 digital pins in three PORTs
-uint8_t GPIOAbstractor::savedPinStates[NPORTS];          //Saved pin values (for abstracting CHANGE mode)
-GPIO_ABSTRACTOR_PINMODE GPIOAbstractor::pinModes[NPORTS][8];             //Saved pin modes supplied by user
+void (*GPIOAbstractor::interruptHandlers[NPORTS][8])();           //The ATMega328P has 8 digital pins in three PORTs
+volatile uint8_t GPIOAbstractor::savedPinStates[NPORTS];          //Saved pin values (for abstracting CHANGE mode)
+GPIO_ABSTRACTOR_PINMODE GPIOAbstractor::pinModes[NPORTS][8];      //Saved pin modes supplied by user
 
 //Define the map of digital pin numbers to <port,bit>.  PortB is port#0, PortC is port#1, and PortD is port#2.
 //The least significant bit (LSB) in a port is bit 0.  Bit 7 is the most significant bit (MSB).  The map
@@ -165,9 +165,6 @@ void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABS
     ::attachInterrupt(digitalPinToInterrupt(digitalPin), isr, intMode);
   } else {
 
-    //Ignore user's requests for modes LOW and HIGH unsupported by ATmega328
-    if (intMode == LOW || intMode == HIGH) return;  //Sorry... Can't report error consistent with attachInterrupt() function
-
     //Ignore requests for illegal digital pin numbers
     if (digitalPin > 23) return;
 
@@ -187,6 +184,9 @@ void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABS
     //If port was previously enabled, then this pin in that port can race during setup below
     noInterrupts();
 
+    //Enable this port's interrupt vector
+    PCICR |= (1 << port);  
+
     //Enable pin change interrupts.  PCINT0..PCINT23 are handled by three vectors, PCINT0..2, each
     //of which can be enabled.  Each vector has a pin change mask controlling which of the 8 possible
     //pins serviced by that vector are actually enabled.
@@ -194,25 +194,26 @@ void GPIOAbstractor::attachInterrupt(uint8_t digitalPin, void (*isr)(), GPIO_ABS
 
       //PORTB services pins 0..7
       case 0:
-        PCMSK0 |= bit;
+        PCMSK0 |= (1<<bit);
         savedPinStates[port] = PINB;  //Save state of pins in this port
         break;
 
       //PORTC services pins 8..14
       case 1:
-        PCMSK1 |= bit;
+        PCMSK1 |= (1<<bit);
         savedPinStates[port] = PINC;  //Save state of pins in this port
         break;
 
       //PORTD services pins 16..23
       case 2:
-        PCMSK2 |= bit;
+        PCMSK2 |= (1<<bit);
         savedPinStates[port] = PIND;  //Save state of pins in this port
         break;
     }
-    PCICR |= (1 << port);  //Enable this port's interrupt vector
-
+ 
     interrupts();
+    Serial.print("PCICR="); Serial.print(PCICR); Serial.print("\n");
+    Serial.print("PCMSK2="); Serial.print(PCMSK2); Serial.print("\n");
 
   }  //pin change interrupt
 }
@@ -230,32 +231,31 @@ ISR(PCINT0_vect) {
   nPortB++;
 #endif
 
-  const uint8_t portX = 0;                                    //Servicing interrupts for PORTB
+  const uint8_t port = 2;  //Servicing interrupts for PORTD
 
   //Determine which pins' values changed
-  uint8_t bitValues = PINB;                                   //Read this port's digital pin bit values
-  uint8_t pinStates = GPIOAbstractor::savedPinStates[portX];  //Recall the previous states of these pins and...
-  GPIOAbstractor::savedPinStates[portX] = bitValues;          //Save their current state for the next interrupt
-  pinStates ^= GPIOAbstractor::savedPinStates[portX];         //1s in pinStates identify changed pins
+  uint8_t bitValues = PINB;                                                //Read this port's digital pin bit values
+  uint8_t changedPins = bitValues ^ GPIOAbstractor::savedPinStates[port];  //1s identify the changed pins
+  GPIOAbstractor::savedPinStates[port] = bitValues;                        //Save their current state for the next interrupt
 
   //Consider action for each pin serviced by this PORT (bit 0 is LSB)
   for (uint8_t bit = 0; bit < 8; bit++) {
 
     //Has the user supplied an interrupt handler for this bit of this port?
-    if (GPIOAbstractor::interruptHandlers[portX][bit] != NULL) {
+    if (GPIOAbstractor::interruptHandlers[port][bit] != NULL) {
 
       //Yes, we have an interrupt handler for this pin.  Did this pin's value change?
-      if (pinStates ^ (1 << bit)) {
+      if (changedPins & (1 << bit)) {
 
-        uint8_t mode = GPIOAbstractor::pinModes[portX][bit];  //When does user want to he about this pin?
-        uint8_t pinValue = pinStates & (1 << bit);            //The value of this digital pin
+        uint8_t mode = GPIOAbstractor::pinModes[port][bit];  //When does user want notified?
+        uint8_t pinValue = bitValues & (1 << bit);         //The value of this digital pin
 
         //  mode        event
         //  CHANGE      pinValue changed      ==>    invoke user's handler
         //  RISING      pinValue changed to 1 ==>    invoke user's handler
         //  FALLING     pinValue changed to 0 ==>    invoke user's handler
         if ((mode == CHANGE) || ((mode == RISING) && (pinValue != 0)) || ((mode == FALLING) && (pinValue == 0))) {
-          GPIOAbstractor::interruptHandlers[portX][bit]();  //Invoke user-supplied ISR
+          GPIOAbstractor::interruptHandlers[port][bit]();  //Invoke user-supplied ISR
         }
 
       }  //pin value changed
@@ -263,6 +263,7 @@ ISR(PCINT0_vect) {
     }  //user-supplied interrrupt handler
 
   }  //bit
+
 
 }  //PCINT0_vect
 
@@ -282,32 +283,31 @@ ISR(PCINT1_vect) {
   nPortC++;
 #endif
 
-  const uint8_t portX = 1;                                    //Servicing interrupts for PORTC
+  const uint8_t port = 2;  //Servicing interrupts for PORTD
 
   //Determine which pins' values changed
-  uint8_t bitValues = PINC;                                   //Read this port's digital pin bit values
-  uint8_t pinStates = GPIOAbstractor::savedPinStates[portX];  //Recall the previous states of these pins and...
-  GPIOAbstractor::savedPinStates[portX] = bitValues;          //Save their current state for the next interrupt
-  pinStates ^= GPIOAbstractor::savedPinStates[portX];         //1s in pinStates identify changed pins
+  uint8_t bitValues = PINC;                                                //Read this port's digital pin bit values
+  uint8_t changedPins = bitValues ^ GPIOAbstractor::savedPinStates[port];  //1s identify the changed pins
+  GPIOAbstractor::savedPinStates[port] = bitValues;                        //Save their current state for the next interrupt
 
   //Consider action for each pin serviced by this PORT (bit 0 is LSB)
   for (uint8_t bit = 0; bit < 8; bit++) {
 
     //Has the user supplied an interrupt handler for this bit of this port?
-    if (GPIOAbstractor::interruptHandlers[portX][bit] != NULL) {
+    if (GPIOAbstractor::interruptHandlers[port][bit] != NULL) {
 
       //Yes, we have an interrupt handler for this pin.  Did this pin's value change?
-      if (pinStates ^ (1 << bit)) {
+      if (changedPins & (1 << bit)) {
 
-        uint8_t mode = GPIOAbstractor::pinModes[portX][bit];  //When does user want to he about this pin?
-        uint8_t pinValue = pinStates & (1 << bit);            //The value of this digital pin
+        uint8_t mode = GPIOAbstractor::pinModes[port][bit];  //When does user want notified?
+        uint8_t pinValue = bitValues & (1 << bit);         //The value of this digital pin
 
         //  mode        event
         //  CHANGE      pinValue changed      ==>    invoke user's handler
         //  RISING      pinValue changed to 1 ==>    invoke user's handler
         //  FALLING     pinValue changed to 0 ==>    invoke user's handler
         if ((mode == CHANGE) || ((mode == RISING) && (pinValue != 0)) || ((mode == FALLING) && (pinValue == 0))) {
-          GPIOAbstractor::interruptHandlers[portX][bit]();  //Invoke user-supplied ISR
+          GPIOAbstractor::interruptHandlers[port][bit]();  //Invoke user-supplied ISR
         }
 
       }  //pin value changed
@@ -315,6 +315,7 @@ ISR(PCINT1_vect) {
     }  //user-supplied interrrupt handler
 
   }  //bit
+
 
 }  //PCINT1_vect
 
@@ -332,32 +333,31 @@ ISR(PCINT2_vect) {
   nPortD++;
 #endif
 
-  const uint8_t portX = 2;  //Servicing interrupts for PORTD
+  const uint8_t port = 2;  //Servicing interrupts for PORTD
 
   //Determine which pins' values changed
-  uint8_t bitValues = PIND;                                   //Read this port's digital pin bit values
-  uint8_t pinStates = GPIOAbstractor::savedPinStates[portX];  //Recall the previous states of these pins and...
-  GPIOAbstractor::savedPinStates[portX] = bitValues;          //Save their current state for the next interrupt
-  pinStates ^= GPIOAbstractor::savedPinStates[portX];         //1s in pinStates identify changed pins
+  uint8_t bitValues = PIND;                                                //Read this port's digital pin bit values
+  uint8_t changedPins = bitValues ^ GPIOAbstractor::savedPinStates[port];  //1s identify the changed pins
+  GPIOAbstractor::savedPinStates[port] = bitValues;                        //Save their current state for the next interrupt
 
   //Consider action for each pin serviced by this PORT (bit 0 is LSB)
   for (uint8_t bit = 0; bit < 8; bit++) {
 
     //Has the user supplied an interrupt handler for this bit of this port?
-    if (GPIOAbstractor::interruptHandlers[portX][bit] != NULL) {
+    if (GPIOAbstractor::interruptHandlers[port][bit] != NULL) {
 
       //Yes, we have an interrupt handler for this pin.  Did this pin's value change?
-      if (pinStates ^ (1 << bit)) {
+      if (changedPins & (1 << bit)) {
 
-        uint8_t mode = GPIOAbstractor::pinModes[portX][bit];  //When does user want to he about this pin?
-        uint8_t pinValue = pinStates & (1 << bit);            //The value of this digital pin
+        uint8_t mode = GPIOAbstractor::pinModes[port][bit];  //When does user want notified?
+        uint8_t pinValue = bitValues & (1 << bit);         //The value of this digital pin
 
         //  mode        event
         //  CHANGE      pinValue changed      ==>    invoke user's handler
         //  RISING      pinValue changed to 1 ==>    invoke user's handler
         //  FALLING     pinValue changed to 0 ==>    invoke user's handler
         if ((mode == CHANGE) || ((mode == RISING) && (pinValue != 0)) || ((mode == FALLING) && (pinValue == 0))) {
-          GPIOAbstractor::interruptHandlers[portX][bit]();  //Invoke user-supplied ISR
+          GPIOAbstractor::interruptHandlers[port][bit]();  //Invoke user-supplied ISR
         }
 
       }  //pin value changed

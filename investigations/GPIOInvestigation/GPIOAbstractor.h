@@ -16,6 +16,9 @@
 
 #pragma once
 
+//Debugging controls and variables
+//#define GPIO_DEBUG 
+
 //Include the declarations for the ATMega328 MCU implementation
 #ifdef ARDUINO_ARCH_AVR
 #include "GPIOAbstractorATMega328.h"

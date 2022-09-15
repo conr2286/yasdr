@@ -13,14 +13,16 @@
 
 #define TEST_PIN 5
 
-extern unsigned nPortB, nPortC, nPortD;
+#ifdef GPIO_DEBUG
+extern volatile unsigned nPortB, nPortC, nPortD;
+#endif
 
 
 typedef unsigned long u32;
 
 GPIOAbstractor gpio;
 
-u32 count;
+volatile u32 count;
 u32 stopTime;  //milliseconds
 
 void myISR() {
@@ -44,9 +46,12 @@ void setup() {
 void loop() {
   if (millis() >= stopTime) {
     Serial.print("count="); Serial.print(count);          //Display count
+#ifdef GPIO_DEBUG
     Serial.print(", nPortB="); Serial.print(nPortB);      //Interrupt counts on ports
     Serial.print(", nPortC="); Serial.print(nPortC);      //Interrupt counts on ports
-    Serial.print(", nPortD="); Serial.println(nPortD);      //Interrupt counts on ports
+    Serial.print(", nPortD="); Serial.print(nPortD);      //Interrupt counts on ports
+#endif
+    Serial.print("\n");
     //count = 0;                    //Reset count to see frequency
     stopTime = millis() + 1000L;
   }

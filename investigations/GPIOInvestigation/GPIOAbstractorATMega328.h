@@ -41,7 +41,7 @@ class GPIOAbstractor {
   //This private section contains device-dependent declarations for this specific MCU
 private:
   static void (*interruptHandlers[][8])();                //User-supplied ISRs for pins of interest to them
-  static uint8_t savedPinStates[NPORTS];  //Saved pin values (for abstracting CHANGE mode)
+  static volatile uint8_t savedPinStates[NPORTS];         //Saved pin values (for abstracting CHANGE mode)
   static GPIO_ABSTRACTOR_PINMODE pinModes[NPORTS][8];     //Saved pin modes supplied by user
   const static PinMap pinMap[];                           //Maps Arduino digital pin number to <port,bit>
   friend void PCINT0_vect(void);                          //Grant interrupt handlers access to our private class members
