@@ -39,7 +39,7 @@ void setup() {
   for (int i=0; i<23; i++) pinMode(i,INPUT_PULLUP);
 
   //Configure test pin and attach an interrupt handler for it
-  pinMode(TEST_PIN,INPUT_PULLUP);
+  gpio.pinMode(TEST_PIN,INPUT_PULLUP);
   gpio.attachInterrupt(TEST_PIN, myISR, RISING);
 }
 
