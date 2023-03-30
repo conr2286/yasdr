@@ -1,7 +1,7 @@
-# wsjtxr
- WSJTX/R Software-Defined Radio
+# yasdx
+ Yet Another Software-Defined Transceiver
  
- WSJTX/R is a software-defined radio for FSK (Frequency Shift Keying) and ASK (Amplitude Shift Keying --- e.g. CW) digital modes constructed around the wsjt-x software executing on a Raspberry Pi 4.
+YASDX is a software-defined radio transceiver for FSK (Frequency Shift Keying) and ASK (Amplitude Shift Keying --- e.g. CW) digital modes constructed around the wsjt-x software executing on a Raspberry Pi 4.
  
  # Investigations
  * Controlling the output power of the Class E final amplifier by varying the duty cycle of the exciter's waveform to avoid key clicks (excessive bandwidth of the Amplitude Shift Keying signal)
