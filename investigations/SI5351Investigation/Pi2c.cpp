@@ -23,18 +23,16 @@
  * Pi2c Constructor
  *
  * @param address	I2C bus address of the slave device
- * @param bus 		Selects a Raspberry i2c bus number
-
+ * @param bus 		Selects a Raspberry bus (Raspberry 4 has several)
+ *
+ * Usage:  Pi2c(60,'1');			//Device 60 on RPi I2C bus 1 (GPIO 2 and 3)
+ *
+ *
  */
-Pi2c::Pi2c(int address, bool rev0){
+Pi2c::Pi2c(int address, char bus){
 	//Set up the filename of the I2C Bus. Choose appropriate bus for Raspberry Pi Rev.
 	char filename[11] = "/dev/i2c-";
-	if (rev0 == true){
-		filename[9] = '0';
-	}
-	else {
-		filename[9] = '1';
-	}
+	filename[9] = bus;
 	filename[10] = 0; //Add the null character onto the end of the array to make it a string
 	
 	i2cHandle_ = open(filename, O_RDWR); //Open the i2c file descriptor in read/write mode
@@ -46,39 +44,36 @@ Pi2c::Pi2c(int address, bool rev0){
 	}
 }
 
+
+//Destructor merely closes the handle
 Pi2c::~Pi2c(){
 	if (i2cHandle_){ //If the I2C File handle is still open...
 		close(i2cHandle_); //...Close it.
 	}
 }
 
-int Pi2c::i2cRead(char *data,int length){
-	int er = read(i2cHandle_,data,length); //Read "length" number of bytes into the "data" buffer from the I2C bus.
-	return er;
-}
-int Pi2c::i2cWrite(char *data,int length){
-	int er = write(i2cHandle_,data,length);//Write "length" number of bytes from the "data" buffer to the I2C bus.
+
+/**
+ * Read count into bfr from I2C device
+ *
+ * @param bfr		Pointer to bfr of at least count bytes
+ * @param count		Number of bytes to read
+ * @return			Number of bytes read or -1 if error
+ */
+int Pi2c::i2cRead(char *bfr,size_t count){
+	int er = read(i2cHandle_,bfr,count); //Read count number of bytes into bfr from the I2C bus.
 	return er;
 }
 
-int Pi2c::i2cReadArduinoInt(){
-	const int arr_size = 2;
-	char tmp[arr_size]; //We know an Arduino Int is 2 Bytes.
-	int retval=-1;
-	
-	if (i2cRead(tmp,arr_size) > 0){
-		retval = tmp[1] << 8 | tmp[0]; //Using bit shifting, turn the 2 byte array into an Int.
-	}
-	return retval;
-}
-
-int Pi2c::i2cWriteArduinoInt(int input){
-	const int arr_size = 2;
-	char tmp[arr_size]; //We know an Arduino Int is 2 Bytes.
-	int retval=0;
-	
-	tmp[0] = input; //get lowest 8 bits into the first part of the array;
-	tmp[1] = input >> 8; //get the highest 8 bits into the second part of the array;
-	retval = (i2cWrite(tmp,arr_size) > 0);
-	return retval;
+/**
+ * Write count bytes from bfr to I2C device
+ *
+ * @param bfr		Pointer to the bytes to be written
+ * @param count		Number of bytes to write
+ * @return			Number of bytes written or -1 if error
+ *
+ */
+int Pi2c::i2cWrite(char *bfr,size_t count){
+	int er = write(i2cHandle_,bfr,count);	//Write count bytes from bfr to I2C device
+	return er;
 }
