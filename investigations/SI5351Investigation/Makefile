@@ -1,4 +1,5 @@
-CFLAGS = -Wall -std=c++20
+CFLAGS = -Wall -std=c17
+CPPFLAGS = -Wall -std=c++20
 PGM = test5351
 OBJS = test5351.o si5351a.o Pi2c.o
 
@@ -9,6 +10,7 @@ all:  rules.d $(PGM)
 
 #-----Builds a debug version of the product (must follow make clean)
 debug: CFLAGS += -O0 -g
+debug: CPPFLAGS += -O0 -g
 debug: rules.d $(PGM) 
 
 #-----Rebuild the dependency (*.d) files from their sources

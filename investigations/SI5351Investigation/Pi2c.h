@@ -19,27 +19,25 @@
 
 #include <iostream>
 #include <linux/i2c-dev.h>
+#include <linux/smbus.h>
 #include <fcntl.h>    /* For O_RDWR */
 #include <unistd.h>   /* For open(), */
 #include <sys/ioctl.h>
 
 class Pi2c {
-		//Var to hold the i2c communications handle, 
-		//...this will only be needed by the class itself, so it's private
-		int i2cHandle_;
+		int fd;					//Linux file descriptor
+
 	public:
-		Pi2c(int address, char bus);
+		Pi2c(char);
 		~Pi2c();
 		
-		//Function: i2cRead - First parameter is a pointer to a char array. This will also contain the 
-		//...values passed back from the Arduino.
-		//...Second parameter is the length of the array.
-		//...Returns: Error value. > 0 is ok. < 0 means there was an error.
-		int i2cRead(char *data,size_t length);
-		
-		//Function: i2cWrite - First parameter is a pointer to a char array.containing the data to send.
-		//...Second parameter is the length of the array.
-		//...Returns: Error value. > 0 is ok. < 0 means there was an error.
-		int i2cWrite(char *data,size_t length);
+		void beginTransmission(uint8_t);
+		int endTransmission(void);
+		int endTransmission(bool);
+
+		int read(char *data,size_t length);
+		size_t write(uint8_t);
+	    size_t write(const uint8_t*, size_t);
+
 		
 };

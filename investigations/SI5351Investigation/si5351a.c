@@ -7,7 +7,7 @@
 // Please also refer to SiLabs AN619 which describes all the registers to use
 //
 #include <inttypes.h>
-#include "i2c.h"
+#include "Pi2c.h"
 #include "si5351a.h"
 
 //
