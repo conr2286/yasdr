@@ -40,6 +40,7 @@ class Pi2c {
 		int read(char *data,size_t length);
 		size_t write(uint8_t);
 	    size_t write(const uint8_t*, size_t);
+	    size_t sendRegister(uint8_t,uint8_t);
 
 		
 };

@@ -29,8 +29,8 @@
 
 #define SI_I2C_ADDR	0x60				//SI5351a I2C Address
 
-void si5351aInit(
-void si5351aOutputOff(uint8_t clk);
-void si5351aSetFrequency(uint32_t frequency);
+
+void si5351OutputOff(uint8_t clk);
+void si5351SetFrequency(uint32_t frequency);
 
 #endif //SI5351A_H

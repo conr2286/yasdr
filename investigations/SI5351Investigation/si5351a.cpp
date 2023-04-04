@@ -10,13 +10,13 @@
 #include "Pi2c.h"
 #include "si5351a.h"
 
-Pi2c Si5351;
+Pi2c si5351;
 
 //
-// Initialize I2C bus
-void i2cInit(char bus) {
-	Si5351 = new Pi2c(bus);
-	Si5351.beginTransmission(SI_I2C_ADDR);
+// Initialize communication with the SI5351
+void si5351Init(char bus) {
+	si5351 = new Pi2c(bus);
+	si5351.beginTransmission(SI_I2C_ADDR);
 }
 
 //
@@ -25,7 +25,7 @@ void i2cInit(char bus) {
 // num is 0..1,048,575 (0xFFFFF)
 // denom is 0..1,048,575 (0xFFFFF)
 //
-void setupPLL(uint8_t pll, uint8_t mult, uint32_t num, uint32_t denom)
+void si5351SetupPLL(uint8_t pll, uint8_t mult, uint32_t num, uint32_t denom)
 {
 	uint32_t P1;					// PLL config register P1
 	uint32_t P2;					// PLL config register P2
@@ -37,40 +37,21 @@ void setupPLL(uint8_t pll, uint8_t mult, uint32_t num, uint32_t denom)
 	P2 = (uint32_t)(128 * num - denom * P2);
 	P3 = denom;
 
-	//Do we really need to specify sequential registers again and again in sequential writes?
-	  /*void SendRegister(uint8_t addr, uint8_t* data, uint8_t n){
-	    start();
-	    SendByte(addr << 1);
-	    while(n--) SendByte(*data++);
-	    stop();
-	  }
-	inline void SendPLLRegisterBulk(){
-      i2c.start();
-      i2c.SendByte(SI5351_ADDR << 1);
-      i2c.SendByte(26+0*8 + 4);  // Write to PLLA
-      //i2c.SendByte(26+1*8 + 4);  // Write to PLLB
-      i2c.SendByte(pll_regs[4]);
-      i2c.SendByte(pll_regs[5]);
-      i2c.SendByte(pll_regs[6]);
-      i2c.SendByte(pll_regs[7]);
-      i2c.stop();
-  }
-	  */
-	i2cSendRegister(pll + 0, (P3 & 0x0000FF00) >> 8);
-	i2cSendRegister(pll + 1, (P3 & 0x000000FF));
-	i2cSendRegister(pll + 2, (P1 & 0x00030000) >> 16);
-	i2cSendRegister(pll + 3, (P1 & 0x0000FF00) >> 8);
-	i2cSendRegister(pll + 4, (P1 & 0x000000FF));
-	i2cSendRegister(pll + 5, ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
-	i2cSendRegister(pll + 6, (P2 & 0x0000FF00) >> 8);
-	i2cSendRegister(pll + 7, (P2 & 0x000000FF));
+	si5351.sendRegister(pll + 0, (P3 & 0x0000FF00) >> 8);
+	si5351.sendRegister(pll + 1, (P3 & 0x000000FF));
+	si5351.sendRegister(pll + 2, (P1 & 0x00030000) >> 16);
+	si5351.sendRegister(pll + 3, (P1 & 0x0000FF00) >> 8);
+	si5351.sendRegister(pll + 4, (P1 & 0x000000FF));
+	si5351.sendRegister(pll + 5, ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
+	si5351.sendRegister(pll + 6, (P2 & 0x0000FF00) >> 8);
+	si5351.sendRegister(pll + 7, (P2 & 0x000000FF));
 }
 
 //
 // Set up MultiSynth with integer divider and R divider
 // R divider is the bit value which is OR'ed onto the appropriate register, it is a #define in si5351a.h
 //
-void setupMultisynth(uint8_t synth, uint32_t divider, uint8_t rDiv)
+void si5351SetupMultisynth(uint8_t synth, uint32_t divider, uint8_t rDiv)
 {
 	uint32_t P1;					// Synth config register P1
 	uint32_t P2;					// Synth config register P2
@@ -80,14 +61,14 @@ void setupMultisynth(uint8_t synth, uint32_t divider, uint8_t rDiv)
 	P2 = 0;							// P2 = 0, P3 = 1 forces an integer value for the divider
 	P3 = 1;
 
-	i2cSendRegister(synth + 0,   (P3 & 0x0000FF00) >> 8);
-	i2cSendRegister(synth + 1,   (P3 & 0x000000FF));
-	i2cSendRegister(synth + 2,   ((P1 & 0x00030000) >> 16) | rDiv);
-	i2cSendRegister(synth + 3,   (P1 & 0x0000FF00) >> 8);
-	i2cSendRegister(synth + 4,   (P1 & 0x000000FF));
-	i2cSendRegister(synth + 5,   ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
-	i2cSendRegister(synth + 6,   (P2 & 0x0000FF00) >> 8);
-	i2cSendRegister(synth + 7,   (P2 & 0x000000FF));
+	si5351.sendRegister(synth + 0,   (P3 & 0x0000FF00) >> 8);
+	si5351.sendRegister(synth + 1,   (P3 & 0x000000FF));
+	si5351.sendRegister(synth + 2,   ((P1 & 0x00030000) >> 16) | rDiv);
+	si5351.sendRegister(synth + 3,   (P1 & 0x0000FF00) >> 8);
+	si5351.sendRegister(synth + 4,   (P1 & 0x000000FF));
+	si5351.sendRegister(synth + 5,   ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
+	si5351.sendRegister(synth + 6,   (P2 & 0x0000FF00) >> 8);
+	si5351.sendRegister(synth + 7,   (P2 & 0x000000FF));
 }
 
 //
@@ -95,9 +76,9 @@ void setupMultisynth(uint8_t synth, uint32_t divider, uint8_t rDiv)
 // Example: si5351aOutputOff(SI_CLK0_CONTROL);
 // will switch off output CLK0
 //
-void si5351aOutputOff(uint8_t clk)
+void si5351OutputOff(uint8_t clk)
 {
-	i2cSendRegister(clk, 0x80);		// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
+	si5351.sendRegister(clk, 0x80);		// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
 }
 
 // 
@@ -110,7 +91,7 @@ void si5351aOutputOff(uint8_t clk)
 // and MultiSynth 0
 // and produces the output on CLK0
 //
-void si5351aSetFrequency(uint32_t frequency)
+void si5351SetFrequency(uint32_t frequency)
 {
 	uint32_t pllFreq;
 	uint32_t xtalFreq = XTAL_FREQ;
@@ -136,18 +117,18 @@ void si5351aSetFrequency(uint32_t frequency)
 	denom = 1048575;				// For simplicity we set the denominator to the maximum 1048575
 
 									// Set up PLL A with the calculated multiplication ratio
-	setupPLL(SI_SYNTH_PLL_A, mult, num, denom);
+	si5351SetupPLL(SI_SYNTH_PLL_A, mult, num, denom);
 									// Set up MultiSynth divider 0, with the calculated divider. 
 									// The final R division stage can divide by a power of two, from 1..128. 
 									// reprented by constants SI_R_DIV1 to SI_R_DIV128 (see si5351a.h header file)
 									// If you want to output frequencies below 1MHz, you have to use the 
 									// final R division stage
-	setupMultisynth(SI_SYNTH_MS_0, divider, SI_R_DIV_1);
+	si5351SetupMultisynth(SI_SYNTH_MS_0, divider, SI_R_DIV_1);
 									// Reset the PLL. This causes a glitch in the output. For small changes to 
 									// the parameters, you don't need to reset the PLL, and there is no glitch
-	i2cSendRegister(SI_PLL_RESET, 0xA0);	
+	si5351.sendRegister(SI_PLL_RESET, 0xA0);
 									// Finally switch on the CLK0 output (0x4F)
 									// and set the MultiSynth0 input to be PLL A
-	i2cSendRegister(SI_CLK0_CONTROL, 0x4F | SI_CLK_SRC_PLL_A);
+	si5351.sendRegister(SI_CLK0_CONTROL, 0x4F | SI_CLK_SRC_PLL_A);
 }
 

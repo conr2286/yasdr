@@ -3,9 +3,9 @@
 int main(void)
 {
 	//Initialize SI5351a on Raspberry Pi I2C bus 1
-	i2cInit('1');
+	si5351Init('1');
 
-	si5351aSetFrequency(10000000);
+	si5351SetFrequency(10000000);
 
 	return 0;
 }

@@ -132,3 +132,20 @@ size_t Pi2c::write(uint8_t c){
 	int er = ::write(fd,&c,1);	//Write 1 byte from c to I2C device
 	return er;
 }
+
+
+
+
+/**
+ * Send one byte to an I2C device register
+ *
+ * @param c			Byte to be written
+ * @return			Number of bytes written or -1 if error
+ *
+ */
+size_t Pi2c::sendRegister(uint8_t reg, uint8_t c){
+	uint8_t bfr[2];
+	bfr[0] = reg;  bfr[1] = c;
+	int er = ::write(fd,bfr,2);		//Write register's number followed by the data byte
+	return er;
+}
