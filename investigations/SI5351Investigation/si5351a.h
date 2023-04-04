@@ -27,6 +27,9 @@
 
 #define XTAL_FREQ	27000000			// Crystal frequency
 
+#define SI_I2C_ADDR	0x60				//SI5351a I2C Address
+
+void si5351aInit(
 void si5351aOutputOff(uint8_t clk);
 void si5351aSetFrequency(uint32_t frequency);
 

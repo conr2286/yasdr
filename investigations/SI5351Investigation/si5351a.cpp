@@ -10,6 +10,15 @@
 #include "Pi2c.h"
 #include "si5351a.h"
 
+Pi2c Si5351;
+
+//
+// Initialize I2C bus
+void i2cInit(char bus) {
+	Si5351 = new Pi2c(bus);
+	Si5351.beginTransmission(SI_I2C_ADDR);
+}
+
 //
 // Set up specified PLL with mult, num and denom
 // mult is 15..90
@@ -28,6 +37,13 @@ void setupPLL(uint8_t pll, uint8_t mult, uint32_t num, uint32_t denom)
 	P2 = (uint32_t)(128 * num - denom * P2);
 	P3 = denom;
 
+	//Do we really need to specify sequential registers again and again in sequential writes?
+	  /*void SendRegister(uint8_t addr, uint8_t* data, uint8_t n){
+	    start();
+	    SendByte(addr << 1);
+	    while(n--) SendByte(*data++);
+	    stop();
+	  }*/
 	i2cSendRegister(pll + 0, (P3 & 0x0000FF00) >> 8);
 	i2cSendRegister(pll + 1, (P3 & 0x000000FF));
 	i2cSendRegister(pll + 2, (P1 & 0x00030000) >> 16);

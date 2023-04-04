@@ -1,9 +1,9 @@
 #include "si5351a.h"
-#include "Pi2c.h"
 
 int main(void)
 {
-	i2cInit();
+	//Initialize SI5351a on Raspberry Pi I2C bus 1
+	i2cInit('1');
 
 	si5351aSetFrequency(10000000);
 

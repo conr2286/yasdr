@@ -21,6 +21,7 @@
  *
 **/
 #include "Pi2c.h"
+#include <iostream>
 
 /**
  * Pi2c Constructor (Akin to Arduino Wire.begin(void)
