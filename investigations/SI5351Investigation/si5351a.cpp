@@ -43,7 +43,19 @@ void setupPLL(uint8_t pll, uint8_t mult, uint32_t num, uint32_t denom)
 	    SendByte(addr << 1);
 	    while(n--) SendByte(*data++);
 	    stop();
-	  }*/
+	  }
+	inline void SendPLLRegisterBulk(){
+      i2c.start();
+      i2c.SendByte(SI5351_ADDR << 1);
+      i2c.SendByte(26+0*8 + 4);  // Write to PLLA
+      //i2c.SendByte(26+1*8 + 4);  // Write to PLLB
+      i2c.SendByte(pll_regs[4]);
+      i2c.SendByte(pll_regs[5]);
+      i2c.SendByte(pll_regs[6]);
+      i2c.SendByte(pll_regs[7]);
+      i2c.stop();
+  }
+	  */
 	i2cSendRegister(pll + 0, (P3 & 0x0000FF00) >> 8);
 	i2cSendRegister(pll + 1, (P3 & 0x000000FF));
 	i2cSendRegister(pll + 2, (P1 & 0x00030000) >> 16);
