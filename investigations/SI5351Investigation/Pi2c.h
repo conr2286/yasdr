@@ -17,9 +17,9 @@
 // Please see https://bitbucket.org/JohnnySheppard/pi2c for example usage.    //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
+//#include <iostream>
 #include <linux/i2c-dev.h>
-#include <linux/smbus.h>
+#include <i2c/smbus.h>
 #include <fcntl.h>    /* For O_RDWR */
 #include <unistd.h>   /* For open(), */
 #include <sys/ioctl.h>

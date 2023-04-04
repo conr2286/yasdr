@@ -6,6 +6,9 @@
  * 	Johnny Sheppard			Appears to be the original author
  * 	Jim Conrad, KQ7B		Minor tweaks for yasdr (doesn't implement all of Wire)
  *
+ * @section NOTES
+ * 	On the RPi, you may need to install libi2c-dev
+ *
  * @section LICENSE
  *
  * GPL3:  This  program  is  free software; you can redistribute it and/or
@@ -17,7 +20,7 @@
  * GNU General Public License for more details.
  *
 **/
-#include "pi2c.h"
+#include "Pi2c.h"
 
 /**
  * Pi2c Constructor (Akin to Arduino Wire.begin(void)

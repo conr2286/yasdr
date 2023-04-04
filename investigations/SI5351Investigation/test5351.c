@@ -1,5 +1,5 @@
 #include "si5351a.h"
-#include "i2c.h"
+#include "Pi2c.h"
 
 int main(void)
 {
