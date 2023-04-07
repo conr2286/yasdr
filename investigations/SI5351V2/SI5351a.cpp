@@ -4,7 +4,7 @@
  *
  * @section ATTRIBUTION
  * @author Hans Summers, 2015					http://www.hanssummers.com
- * @author Richard Tomlinson G4TGJ 2018/2019 	Eliminated float to just use 32 bit integers.
+ * @author Richard Tomlinson G4TGJ 2018/2019 	Eliminated float to just use 32 bit integers
  * @author Jim Conrad KQ7B, 2023				Implementation for yasdr
  *
  * @section LICENSE
@@ -19,18 +19,20 @@
  * @section REFERENCES
  * http://www.hanssummers.com/synth				SI5351a synthesizer kit
  * https://www.skyworksinc.com/-/media/Skyworks/SL/documents/public/application-notes/AN619.pdf
+ * https://forums.adafruit.com/viewtopic.php?p=348641
+ * https://github.com/leon-anavi/rpi-examples.git
+ * https://github.com/G4TGJ/TARL.git
  *
  **/
 
 #include <inttypes.h>
 #include <stdio.h>
 
-#include "config.h"
-#include "osc.h"
-#include "millis.h"
+//#include "config.h"
+//#include "osc.h"
+//#include "millis.h"
 #include "SI5351a.h"
 
-#include "Pi2C.h"
 #include "Pi2C.h"
 
 //The I2C interface provides operating system independent access to the I2C bus
@@ -96,20 +98,102 @@ static uint32_t clockFreq[NUM_CLOCKS];
 // The crystal frequency which is initialised from NVRAM
 static uint32_t xtalFreq;
 
+
+// Enable/disable the clock output
+//
+// clk The clock bit (or bits)
+// bEnable true to enable and false to disable
+static void si5351aOutputEnable(uint8_t clk, bool bEnable) {
+	uint8_t reg;
+
+	// Read the existing register
+	if (i2c.readRegister(SI_CLK_ENABLE, &reg) == 0) {
+		if (bEnable) {
+			// Enable by clearing the bit
+			reg &= ~clk;
+		} else {
+			// Disable by setting the bit
+			reg |= clk;
+		}
+		i2c.sendRegister(SI_CLK_ENABLE, reg);
+	}
+} //si5351aOutputEnable()
+
+
+
+
+//
+// Switches off Si5351a output
+// Example: si5351aOutputOff(SI_CLK0_CONTROL);  //Will switch off output CLK0
+//
+static void si5351aOutputOff(uint8_t clk) {
+	i2c.sendRegister(clk, 0x80);// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
+
+} //si5351aOutputOff
+
+
+
+
+
+
 /**
- * si5351Init --- Initialize communication with the SI5351a chipset
+ * si5351Init --- Initialize I2C communication and the SI5351a chipset
  *
- * @param bus		Selects the host processor's I2C (SDA/SCL) bus pins
+ * @param busName	Specifies which I2C bus hosts the SI5351a
  * @param addr		Selects the SI5351a device on that bus
- * @param xtalHz	SI5351a crystal frequency in Hz
+ * @param fXtal		SI5351a crystal frequency in Hz (nominally 27000000)
+ * @param cXtal		SI5351a load capacitance in pF (nominally 10 pF)
+ * @return			0==success, -1==timeout
  *
- * Usage:  si5351Init('1',0x60,27000000)	//Select device 0x60 on I2C bus '1' with 27 mHz xtal
+ * Usage:  si5351Init("/dev/i2c-1",0x60,27000000,10)	//Select device 0x60 on I2C bus 1 with 27 mHz xtal
  */
 
-void si5351Init(char bus, uint8_t addr, uint32_t xtalHz) {
-	i2c = new Pi2C(bus, addr);
-	xtalFreq = xtalHz;
+int si5351Init(char* busName, uint8_t addr, uint32_t fXtal, uint32_t cXtal) {
+	uint8_t regVal;
+	int i;
+
+	//Build an interface to the I2C bus hosting the SI5351
+	i2c = new Pi2C(busName, addr);
+
+	//Remember the SI5351a crystal frequency (as it likely isn't *exactly* 27mHz)
+	xtalFreq = fXtal;		//Hz
+
+	// Wait for the device to be ready
+	for (i = 0; i < MAX_INIT_TRIES; i++) {
+
+		// Poll the device status register until the system init bit clears
+		if ((i2c.readRegister(SI_DEVICE_STATUS, &regVal) == 0) && !(regVal & SYS_INIT)) {
+			break;
+		}
+
+	} //for
+
+	// See if we have timed out
+	if (i >= MAX_INIT_TRIES) {
+		i2c.~Pi2C();
+		return -1;
+	} else {
+		// Chip is present and initialized.  Start by turning everything off as described
+		// in figure 12 of the data sheet.  They will be enabled when the frequency is set.
+		// Disable all the outputs
+		si5351aOutputEnable(SI_CLK_ENABLE_0 | SI_CLK_ENABLE_1 | SI_CLK_ENABLE_2, false);
+
+		// Power down all the output drivers
+		si5351aOutputOff(SI_CLK0_CONTROL);
+		si5351aOutputOff(SI_CLK1_CONTROL);
+		si5351aOutputOff(SI_CLK2_CONTROL);
+
+		// Set the crystal load capacitance
+		i2c.sendRegister(SI_XTAL_LOAD, cXtal);
+	}
+
+	return 0;
+
 } //si5351Init()
+
+
+
+
 
 /**
  * Setup the specified PLL with the specified divider and frequency
@@ -231,38 +315,13 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
 
 
 
-//
-// Switches off Si5351a output
-// Example: si5351aOutputOff(SI_CLK0_CONTROL);  //Will switch off output CLK0
-//
-static void si5351aOutputOff(uint8_t clk) {
-	i2c.sendRegister(clk, 0x80);// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
-
-} //si5351aOutputOff
 
 
 
 
 
-// Enable/disable the clock output
-//
-// clk The clock bit (or bits)
-// bEnable true to enable and false to disable
-static void si5351aOutputEnable(uint8_t clk, bool bEnable) {
-	uint8_t reg;
 
-	// Read the existing register
-	if (i2c.readRegister(SI_CLK_ENABLE, &reg) == 0) {
-		if (bEnable) {
-			// Enable by clearing the bit
-			reg &= ~clk;
-		} else {
-			// Disable by setting the bit
-			reg |= clk;
-		}
-		i2c.sendRegister(SI_CLK_ENABLE, reg);
-	}
-} //si5351aOutputEnable
+
 
 
 
@@ -562,7 +621,7 @@ void oscSetFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 				rDiv[firstClock]);
 
 		// Delay needed for it to take changes
-		delay(1);
+		i2c.delay(1);
 
 		// Set quadrature mode if applicable (only for clock 0 or clock 1)
 		if (clock != 2) {
@@ -586,7 +645,7 @@ void oscSetFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 		if (firstClock == 0) {
 			setupMultisynth(SI_SYNTH_MS_1, a1, b1, c1, rDiv[1]);
 
-			delay(1);
+			i2c.delay(1);
 		}
 
 		// If the divider has changed then set everything up
@@ -613,47 +672,5 @@ void oscSetXtalFrequency(uint32_t xtal_freq) {
 
 
 
-// Initialise the si5351a chip
-// Returns true if successful
-// Returns false if unable to talk to it or it doesn't initialise properly
-bool oscInit(void) {
-	int i;
-	uint8_t regVal;
-
-	// We talk to the chip over I2C
-	i2cInit();
-
-	// Wait for the device to be ready
-	for (i = 0; i < MAX_INIT_TRIES; i++) {
-		// Poll the device status register until the system init bit clears
-		if ((i2cReadRegister(SI5351A_I2C_ADDRESS, SI_DEVICE_STATUS, &regVal)
-				== 0) && !(regVal & SYS_INIT)) {
-			break;
-		}
-	} //for
-
-	// See if we have timed out
-	if (i == MAX_INIT_TRIES) {
-		return false;
-	} else {
-		// Chip is present and initialised
-		//
-		// Start by turning everything off as described in figure 12 of the data sheet.
-		// They will be enabled when the frequency is set.
-		//
-		// Disable all the outputs
-		si5351aOutputEnable(SI_CLK_ENABLE_0 | SI_CLK_ENABLE_1 | SI_CLK_ENABLE_2, false);
-
-		// Power down all the output drivers
-		si5351aOutputOff(SI_CLK0_CONTROL);
-		si5351aOutputOff(SI_CLK1_CONTROL);
-		si5351aOutputOff(SI_CLK2_CONTROL);
-
-		// Set the crystal load capacitance
-		i2c.sendRegister(SI_XTAL_LOAD, SI_XTAL_LOAD_CAP);
-
-		return true;
-	} //i
-} //oscInit()
 
 

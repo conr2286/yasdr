@@ -36,8 +36,10 @@ public:
 		~Pi2C();						//Destruction
 
 
-		int sendRegister(uint8_t, uint8_t);
-
-
+		void sendRegister(uint8_t, uint8_t);
+		uint8_t readRegister(uint8_t);
+		void readRegister(uint8_t, uint8_t*);
 		
+		void delay(uint32_t);
+
 };

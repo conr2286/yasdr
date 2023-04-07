@@ -7,9 +7,21 @@
  *
  * @section NOTES
  *  This implementation of the Pi2C class interface was originally developed for
- *  use with Raspberry Pi 4 hardware supervised by bullseye.
+ *  use with Raspberry Pi (RPi) 4 hardware supervised by bullseye and tested with
+ *  the SI5351a chipset.
+ *
+ *  This implementation uses the kernel's smbus feature to enable support for
+ *  repeated START I2C bus operations (e.g. START, write register, START,
+ *  read byte from previously designated register).
  *
  * 	On the RPi, you likely need to install libi2c-dev.
+ *
+ * 	@section REFERENCES
+ * 	https://pimylifeup.com/raspberry-pi-i2c/
+ * 	https://www.kernel.org/doc/Documentation/i2c/dev-interface
+ *	https://learn.adafruit.com/working-with-i2c-devices/repeated-start
+ *	https://android.googlesource.com/kernel/msm/+/f5335159eed416b26b7c8a5a4e8820f97dc1ad19/Documentation/i2c/dev-interface
+ *
  *
  * @section MIT LICENSE
  * Copyright (c) <2023> <Jim Conrad, KQ7B>
@@ -34,6 +46,7 @@
 **/
 
 #include <errno.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <stdexcept>
 #include <linux/types.h>
@@ -48,6 +61,7 @@
  *
  * @param busName 	Linux filename of the desired I2C bus
  * @param addr		The 7-bit I2C device address
+ * @throw errno
  *
  * Usage:  Pi2C("/dev/i2c-1",0x60);			//Device 0x60 on RPi I2C bus 1 (GPIO 2 and 3)
  *
@@ -94,21 +108,85 @@ Pi2C::~Pi2C(){
  * @param reg		Target register
  * @param c			Byte to be written
  * @return			Number of bytes written or -1 if error
+ * @throw			errno
  *
  * @section NOTES
  * Someday consider overloading sendRegister with a method passing the I2C device address as a parameter?
  *
  */
-int Pi2C::sendRegister(uint8_t reg, uint8_t c) {
-	return i2c_smbus_write_byte_data(fd, reg, c) < 0);
-}
+void Pi2C::sendRegister(uint8_t reg, uint8_t c) {
+	if (i2c_smbus_write_byte_data(fd, reg, c) < 0) {
+		throw errno;
+	}
+} //sendRegister()
 
 
 
 
 
+/**
+ * Read one byte from a designated register in the I2C device accessed through the fd member
+ *
+ * @param reg		Target register
+ * @return			Number of bytes written or -1 if error
+ *
+ * @section NOTES
+ * Someday consider overloading sendRegister with a method passing the I2C device address as a parameter?
+ *
+*/
+uint8_t Pi2C::readRegister(uint8_t reg) {
+	__s32 val = i2c_smbus_read_byte_data(fd, reg);
+	if (val < 0) {
+		throw errno;
+	}
+	else return (uint8_t) val;
+
+} //readRegister()
 
 
+
+
+
+/**
+ * Read one byte from a designated register in the I2C device accessed through the fd member
+ *
+ * @param reg		Target register
+ * @param pBfr		Pointer to a one byte buffer to receive the data
+ *
+ * @section NOTES
+ * Someday consider overloading sendRegister with a method passing the I2C device address as a parameter?
+ *
+*/
+void Pi2C::readRegister(uint8_t reg, uint8_t* pBfr) {
+	__s32 val = i2c_smbus_read_byte_data(fd, reg);
+	if (val < 0) {
+		throw errno;
+	}
+	*pBfr = (uint8_t) val;
+
+} //readRegister()
+
+
+
+
+
+/**
+ * Delay execution of the calling thread
+ *
+ * @param mSec		Number of milliseconds for execution to be delayed
+ *
+ * @section NOTES
+ * This method doesn't actually access the I2C bus, but it's common for I2C devices to
+ * require a delay following an issued command.  So... it's here to simplify programming I2C
+ * devices and to emphasize the purpose of the delay has to do with an I2C device.
+ */
+void Pi2C::delay(uint32_t mSec) {
+
+	if (usleep(mSec*1000L) < 0) {
+		throw errno;
+	}
+
+} //delay()
 
 
 
