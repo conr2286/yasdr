@@ -55,7 +55,7 @@
 #include "Pi2C.h"
 
 //Member variables for this SI5351a device located on this I2C bus
-Pi2C i2c;				//This bus
+Pi2C *i2c;				//This bus
 uint8_t addr;			//This device
 
 // SI5351 internal register definitions
@@ -118,43 +118,42 @@ static uint32_t clockFreq[NUM_CLOCKS];
 // The crystal frequency which is initialised from NVRAM
 static uint32_t xtalFreq;
 
-
-// Enable/disable the clock output
-//
-// clk The clock bit (or bits)
-// bEnable true to enable and false to disable
-static void si5351aOutputEnable(uint8_t clk, bool bEnable) {
+/**
+ * Enable/Disable a clock
+ *
+ * @param addr					I2C address of SI5351a
+ * @param clk					The clock bit(s)
+ * @param bEnable				true==enable, false==disable
+ * @throw errno					I2C communication failure
+ *
+ */
+static void si5351aOutputEnable(uint8_t addr, uint8_t clk, bool bEnable) {
 	uint8_t reg;
 
 	// Read the existing register
-	if (i2c.readRegister(addr,SI_CLK_ENABLE, &reg) == 0) {
-		if (bEnable) {
-			// Enable by clearing the bit
-			reg &= ~clk;
-		} else {
-			// Disable by setting the bit
-			reg |= clk;
-		}
-		i2c.sendRegister(addr,SI_CLK_ENABLE, reg);
+	try {
+		reg = i2c->readRegister(addr, SI_CLK_ENABLE);
+	} catch (int e) {
+		throw e;
 	}
-} //si5351aOutputEnable()
-
-
-
+	if (bEnable) {
+		// Enable by clearing the clk bit(s)
+		reg &= ~clk;
+	} else {
+		// Disable by setting the clk bit(s)
+		reg |= clk;
+	}
+	i2c->sendRegister(addr, SI_CLK_ENABLE, reg);
+}
 
 //
 // Switches off Si5351a output
 // Example: si5351aOutputOff(SI_CLK0_CONTROL);  //Will switch off output CLK0
 //
 static void si5351aOutputOff(uint8_t clk) {
-	i2c.sendRegister(addr,clk, 0x80);// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
+	i2c->sendRegister(addr, clk, 0x80); // Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
 
 } //si5351aOutputOff
-
-
-
-
-
 
 /**
  * si5351Init --- Initialize I2C communication and the SI5351a chipset
@@ -168,36 +167,34 @@ static void si5351aOutputOff(uint8_t clk) {
  * Usage:  si5351Init("/dev/i2c-1",0x60,27000000,10)	//Select device 0x60 on I2C bus 1 with 27 mHz xtal
  */
 
-int si5351Init(char* busName, uint8_t address, uint32_t fXtal, uint32_t cXtal) {
+int si5351Init(const char *busName, uint8_t address, uint32_t fXtal, uint32_t cXtal) {
 	uint8_t regVal;
 	int i;
 
 	//Build an interface to the I2C bus hosting the SI5351
 	i2c = new Pi2C(busName);	//Remember this I2C bus
-	addr = address;				//Remember I2C address of this SI5351 on that bus
+	addr = address;			//Remember I2C address of this SI5351 on that bus
 
 	//Remember the SI5351a crystal frequency (as it likely isn't *exactly* 27mHz)
 	xtalFreq = fXtal;		//Hz
 
 	// Wait for the device to be ready
-	for (i = 0; i < MAX_INIT_TRIES; i++) {
+	do {
 
 		// Poll the device status register until the system init bit clears
-		if ((i2c.readRegister(addr,SI_DEVICE_STATUS, &regVal) == 0) && !(regVal & SYS_INIT)) {
-			break;
-		}
+		regVal = i2c->readRegister(addr, SI_DEVICE_STATUS);
 
-	} //for
+	} while ((i++<MAX_INIT_TRIES)&&((regVal&SYS_INIT) != 0));
 
 	// See if we have timed out
 	if (i >= MAX_INIT_TRIES) {
-		i2c.~Pi2C();
+		i2c -> ~Pi2C();
 		return -1;
 	} else {
 		// Chip is present and initialized.  Start by turning everything off as described
 		// in figure 12 of the data sheet.  They will be enabled when the frequency is set.
 		// Disable all the outputs
-		si5351aOutputEnable(SI_CLK_ENABLE_0 | SI_CLK_ENABLE_1 | SI_CLK_ENABLE_2, false);
+		si5351aOutputEnable(addr, SI_CLK_ENABLE_0 | SI_CLK_ENABLE_1 | SI_CLK_ENABLE_2, false);
 
 		// Power down all the output drivers
 		si5351aOutputOff(SI_CLK0_CONTROL);
@@ -205,16 +202,12 @@ int si5351Init(char* busName, uint8_t address, uint32_t fXtal, uint32_t cXtal) {
 		si5351aOutputOff(SI_CLK2_CONTROL);
 
 		// Set the crystal load capacitance
-		i2c.sendRegister(addr,SI_XTAL_LOAD, cXtal);
+		i2c->sendRegister(addr, SI_XTAL_LOAD, cXtal);
 	}
 
 	return 0;
 
 } //si5351Init()
-
-
-
-
 
 /**
  * Setup the specified PLL with the specified divider and frequency
@@ -224,20 +217,20 @@ int si5351Init(char* busName, uint8_t address, uint32_t fXtal, uint32_t cXtal) {
  * @param frequency	Hz
  **/
 static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
-	// a, b and c as defined in AN619
+// a, b and c as defined in AN619
 	uint32_t a, b, c;
 
-	//PLL configuration register values
+//PLL configuration register values
 	uint32_t P1;
 	uint32_t P2;
 	uint32_t P3;
 
-	// We only send bytes that change to minimize RF noise from the I2C bus
+// We only send bytes that change to minimize RF noise from the I2C bus
 #define NUM_PLL_BYTES 8
 	static uint8_t prevPll[NUM_SYNTH_PLL][NUM_PLL_BYTES];
 	uint8_t newPll[NUM_SYNTH_PLL][NUM_PLL_BYTES];
 
-	// Ensure PLL is within range
+// Ensure PLL is within range
 	if (pll < NUM_SYNTH_PLL) {
 		// We will set the denominator as the crystal frequency divided by 27 as we
 		// want it to be about a million so it is as large as possible for greatest resolution.
@@ -283,15 +276,12 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
 			// Write changed registers and always register 7. It appears that writing
 			// this last register latches in the new values.
 			if (i == 7 || (newPll[pll][i] != prevPll[pll][i])) {
-				i2c.sendRegister(addr,synthPLL[pll] + i, newPll[pll][i]);
+				i2c->sendRegister(addr, synthPLL[pll] + i, newPll[pll][i]);
 				prevPll[pll][i] = newPll[pll][i];
 			}
 		} //for
 	} //if
 } //setupPLL
-
-
-
 
 /**
  * Set up MultiSynth with divider a+b/c and R divider
@@ -311,48 +301,43 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
 	uint32_t P3;					// Synth config register P3
 	uint8_t Div4 = 0;              // Divide by 4 bits
 
-	// Calculate the values as defined in AN619
+// Calculate the values as defined in AN619
 	uint32_t p = 128 * b / c;
 	P1 = 128 * a + p - 512;
 	P2 = 128 * b - c * p;
 	P3 = c;
 
-	// If the divider is 4 then special bits to set
+// If the divider is 4 then special bits to set
 	if (a == 4) {
 		Div4 = 0x0c;
 	}
 
-	i2c.sendRegister(addr,synth + 0, (P3 & 0x0000FF00) >> 8);
-	i2c.sendRegister(addr,synth + 1, (P3 & 0x000000FF));
-	i2c.sendRegister(addr,synth + 2, ((P1 & 0x00030000) >> 16) | rDiv | Div4);
-	i2c.sendRegister(addr,synth + 3, (P1 & 0x0000FF00) >> 8);
-	i2c.sendRegister(addr,synth + 4, (P1 & 0x000000FF));
-	i2c.sendRegister(addr,synth + 5,
+	i2c->sendRegister(addr, synth + 0, (P3 & 0x0000FF00) >> 8);
+	i2c->sendRegister(addr, synth + 1, (P3 & 0x000000FF));
+	i2c->sendRegister(addr, synth + 2, ((P1 & 0x00030000) >> 16) | rDiv | Div4);
+	i2c->sendRegister(addr, synth + 3, (P1 & 0x0000FF00) >> 8);
+	i2c->sendRegister(addr, synth + 4, (P1 & 0x000000FF));
+	i2c->sendRegister(addr, synth + 5,
 			((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
-	i2c.sendRegister(addr,synth + 6, (P2 & 0x0000FF00) >> 8);
-	i2c.sendRegister(addr,synth + 7, (P2 & 0x000000FF));
+	i2c->sendRegister(addr, synth + 6, (P2 & 0x0000FF00) >> 8);
+	i2c->sendRegister(addr, synth + 7, (P2 & 0x000000FF));
 } //setupMultisynth
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-// Enable/disable a clock output
-void oscClockEnable(uint8_t clock, bool bEnable) {
+/**
+ * Enable/disable a clock output
+ *
+ * @param clock				Select clock (0..2) to enable/disable
+ * @param bEnable			true=enable, false=disable
+ */
+void si5351ClockEnable(uint8_t clock, bool bEnable) {
 	if (clock < NUM_CLOCKS) {
-		si5351aOutputEnable( SI_CLK_ENABLE_0 << clock, bEnable);
+		si5351aOutputEnable(addr, SI_CLK_ENABLE_0 << clock, bEnable);
 	}
-}
+} //si5351ClockEnable()
 
 
 
@@ -366,9 +351,9 @@ void oscClockEnable(uint8_t clock, bool bEnable) {
 static uint32_t getMultisynthDivider(uint32_t frequency, bool bQuadrature) {
 	uint32_t divider = 0;
 
-	// For quadrature output the maximum divider is 126 so we
-	// have to use lower VCO frequencies for some bands.
-	// This will limit the possible frequency range.
+// For quadrature output the maximum divider is 126 so we
+// have to use lower VCO frequencies for some bands.
+// This will limit the possible frequency range.
 	if (bQuadrature) {
 		if (frequency < 5000000) {
 			divider = 126;
@@ -418,23 +403,20 @@ static uint32_t getMultisynthDivider(uint32_t frequency, bool bQuadrature) {
 	return divider;
 } //getMultisynthDivider
 
-
-
-
 // Calculate the divider (a+b/c) for a given clock frequency and PLL frequency
 static void calcDivider(uint32_t clockFreq, uint32_t pllFreq, uint32_t *pa,
 		uint32_t *pb, uint32_t *pc) {
-	// Intermediate calculations
+// Intermediate calculations
 	uint32_t d, r;
 
-	// Firstly work out the divider a and the remainder
+// Firstly work out the divider a and the remainder
 	*pa = pllFreq / clockFreq;
 	r = pllFreq % clockFreq;
 
-	// b/c == r/frequency but we can't use these directly since
-	// c can only be up to 1048575 so have to scale for this
-	// We will scale by d to achieve this
-	// (1000000/48575 is about 21)
+// b/c == r/frequency but we can't use these directly since
+// c can only be up to 1048575 so have to scale for this
+// We will scale by d to achieve this
+// (1000000/48575 is about 21)
 	if (clockFreq < 21000000) {
 		d = 21;
 	} else {
@@ -444,14 +426,14 @@ static void calcDivider(uint32_t clockFreq, uint32_t pllFreq, uint32_t *pa,
 	*pb = r / d;
 	*pc = clockFreq / d;
 
-	// Maximum possible divider is 900
+// Maximum possible divider is 900
 	if (*pa >= 900) {
 		*pa = 900;
 		*pb = 0;
 		*pc = 1;
 	}
 
-	// Below 8 only 4 or 6 are legal
+// Below 8 only 4 or 6 are legal
 	else if (*pa < 8) {
 		if (*pa == 7) {
 			*pa = 8;
@@ -464,9 +446,6 @@ static void calcDivider(uint32_t clockFreq, uint32_t pllFreq, uint32_t *pa,
 		*pc = 1;
 	}
 } //calcDivider()
-
-
-
 
 // Get the R Div for the frequency. Only used for low frequencies
 // below 1MHz. With this extra divider have to change the clock
@@ -522,9 +501,6 @@ static uint8_t getRDiv(uint32_t *pFreq) {
 	return rDiv;
 } //getRDiv()
 
-
-
-
 // Set the clock to the given frequency with optional quadrature.
 //
 // quadrature is only used for clock 1 - it is ignored for the others
@@ -533,22 +509,24 @@ static uint8_t getRDiv(uint32_t *pFreq) {
 // 0 is no quadrature i.e. set the frequency as normal
 // When quadrature is set for clock 1 then it is set to the same frequency as clock 0
 void si5351setFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
-	// Whether quadrature has been enabled
+// Whether quadrature has been enabled
 	static int8_t quadrature;
 
-	// To get the output frequency the PLL is divided by a+b/c
+	printf("si5351setFrequency(%u,%u,%u)\n",clock,frequency,q);
+
+// To get the output frequency the PLL is divided by a+b/c
 	uint32_t a, b, c;
 
-	// Clocks 0 and 1 share a PLL so need a divider for the other clock
+// Clocks 0 and 1 share a PLL so need a divider for the other clock
 	uint32_t a1, b1, c1;
 
-	// The PLL clock and reset bits for this clock
+// The PLL clock and reset bits for this clock
 	uint8_t pll_clock, pll_reset;
 
-	// The first (or only) clock we are setting
+// The first (or only) clock we are setting
 	uint8_t firstClock;
 
-	// We will reset the PLLs only when the divider or quadrature changes
+// We will reset the PLLs only when the divider or quadrature changes
 	static uint32_t prevDivider[NUM_CLOCKS];
 	static int8_t prevQuadrature;
 
@@ -642,31 +620,31 @@ void si5351setFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 				rDiv[firstClock]);
 
 		// Delay needed for it to take changes
-		i2c.delay(1);
+		i2c->delay(1);
 
 		// Set quadrature mode if applicable (only for clock 0 or clock 1)
 		if (clock != 2) {
 			if (quadrature < 0) {
-				i2c.sendRegister(addr,SI_CLK0_PHOFF, 0);
-				i2c.sendRegister(addr,SI_CLK1_PHOFF, a);
+				i2c->sendRegister(addr, SI_CLK0_PHOFF, 0);
+				i2c->sendRegister(addr, SI_CLK1_PHOFF, a);
 			} else if (quadrature > 0) {
-				i2c.sendRegister(addr,SI_CLK0_PHOFF, a);
-				i2c.sendRegister(addr,SI_CLK1_PHOFF, 0);
+				i2c->sendRegister(addr, SI_CLK0_PHOFF, a);
+				i2c->sendRegister(addr, SI_CLK1_PHOFF, 0);
 			} else {
-				i2c.sendRegister(addr,SI_CLK0_PHOFF, 0);
-				i2c.sendRegister(addr,SI_CLK1_PHOFF, 0);
+				i2c->sendRegister(addr, SI_CLK0_PHOFF, 0);
+				i2c->sendRegister(addr, SI_CLK1_PHOFF, 0);
 			}
 		}
 
 		// Switch on the clock
-		i2c.sendRegister(addr,SI_CLK0_CONTROL + clock, 0x4F | pll_clock);
+		i2c->sendRegister(addr, SI_CLK0_CONTROL + clock, 0x4F | pll_clock);
 
 		// If we are setting clock 0 then we need to also set the multisynth divider for
 		// clock 1 because it also uses PLL A
 		if (firstClock == 0) {
 			setupMultisynth(SI_SYNTH_MS_1, a1, b1, c1, rDiv[1]);
 
-			i2c.delay(1);
+			i2c->delay(1);
 		}
 
 		// If the divider has changed then set everything up
@@ -675,23 +653,15 @@ void si5351setFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 		if (a != prevDivider[clock]) {
 			// Reset the PLLs. This causes a glitch in the output. For small changes to
 			// the parameters, you don't need to reset the PLL, and there is no glitch
-			i2c.sendRegister(addr,SI_PLL_RESET, pll_reset);
+			i2c->sendRegister(addr, SI_PLL_RESET, pll_reset);
 
 			prevDivider[clock] = a;
 		}
 	}
 } //oscSetFrequency
 
-
-
-
 // Set the crystal frequency.
 void oscSetXtalFrequency(uint32_t xtal_freq) {
 	xtalFreq = xtal_freq;
 } //oscSetXtalFrequency
-
-
-
-
-
 

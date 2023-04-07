@@ -32,7 +32,7 @@ private:
 		int fd;							//Linux file descriptor accessing the I2C bus
 
 public:
-		Pi2C(char *);					//Constructor
+		Pi2C(const char *);					//Constructor
 		~Pi2C();						//Destruction
 
 

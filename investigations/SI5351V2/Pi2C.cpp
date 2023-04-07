@@ -66,6 +66,7 @@
  *
  **/
 
+#include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -92,7 +93,9 @@
  * I2C device address.
  *
  */
-Pi2C::Pi2C(char *busName) {
+Pi2C::Pi2C(const char *busName) {
+
+	printf("Pi2C(%s)\n",busName);
 
 	//Open the I2C bus
 	fd = open(busName, O_RDWR); //Open the i2c file descriptor in read/write mode
@@ -172,7 +175,7 @@ void Pi2C::readRegister(uint8_t dev, uint8_t reg, uint8_t *pBfr) {
 	params[0].addr = dev;						//Specify slave device address
 	params[0].flags = 0;						//Write
 	params[0].len = 1;							//Send a single byte (register number)
-	params[0].buf = outbuf;						//Buffer containing the register number
+	params[0].buf = outBfr;						//Buffer containing the register number
 
 	//Build ioctl I2C_RDWR parameters to read from the previously selected register in device
 	params[1].addr = dev;						//Specify slave device address
@@ -183,7 +186,7 @@ void Pi2C::readRegister(uint8_t dev, uint8_t reg, uint8_t *pBfr) {
 	//The ioctl I2C_RDWR transaction
 	req[0].msgs = params;						//Parameters for combined write/read operation
 	req[0].nmsgs = 2;							//Two parts to this transaction
-	if (ioctl(i2c_fd, I2C_RDWR, &req) < 0) {
+	if (ioctl(fd, I2C_RDWR, &req) < 0) {
 		throw errno;
 	}
 
