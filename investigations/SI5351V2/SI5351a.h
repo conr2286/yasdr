@@ -32,6 +32,8 @@
 
 void si5351OutputOff(uint8_t clk);
 void si5351SetFrequency(uint32_t frequency);
+void si5351setFrequency(uint8_t clock, uint32_t frequency, int8_t q);
+int  si5351Init(char* busName, uint8_t addr, uint32_t fXtal, uint32_t cXtal);
 
 
 
