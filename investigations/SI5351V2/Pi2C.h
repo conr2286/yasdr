@@ -29,16 +29,16 @@
 class Pi2C {
 
 private:
-		int fd;							//Linux file descriptor accessing the I2C slave device
+		int fd;							//Linux file descriptor accessing the I2C bus
 
 public:
-		Pi2C(char *, uint8_t);			//Constructor
+		Pi2C(char *);					//Constructor
 		~Pi2C();						//Destruction
 
 
-		void sendRegister(uint8_t, uint8_t);
-		uint8_t readRegister(uint8_t);
-		void readRegister(uint8_t, uint8_t*);
+		void sendRegister(uint8_t, uint8_t, uint8_t);
+		uint8_t readRegister(uint8_t, uint8_t);
+		void readRegister(uint8_t, uint8_t, uint8_t*);
 		
 		void delay(uint32_t);
 

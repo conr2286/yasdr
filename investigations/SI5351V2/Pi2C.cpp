@@ -5,22 +5,43 @@
  * @author
  * 	Jim Conrad, KQ7B		Implementation for yasdr
  *
+ * 	Pi2C constructs an interface to a Raspberry Pi I2C bus (the RPi 4 supports
+ * 	several busses).  You will need one Pi2C object for each bus in use, but
+ * 	one object can access any device on its bus.
+ *
+ * 	The constructor prepares the bus for access, after which you
+ * 	may use the read/write methods to access device(s) on that bus.
+ *
  * @section NOTES
  *  This implementation of the Pi2C class interface was originally developed for
  *  use with Raspberry Pi (RPi) 4 hardware supervised by bullseye and tested with
- *  the SI5351a chipset.
+ *  the SI5351a chip.
  *
- *  This implementation uses the kernel's smbus feature to enable support for
- *  repeated START I2C bus operations (e.g. START, write register, START,
- *  read byte from previously designated register).
+ *  The RPi supports several ways to access an I2C device.  The open/read/write
+ *  approach binds a file descriptor to a specific device and lacks support for
+ *  the I2C "Repeated START" (e.g. START, write register, START, read byte)
+ *  operation.  The smbus approach supports "Repeated START" but binds the file
+ *  descriptor to a single device rather than the bus.  The ioctl I2C_RDWR
+ *  approach used here binds the open file descriptor (and hence a Pi2C object)
+ *  to a bus, not a specific device, and also supports the I2C "Repeated START"
+ *  feature required to read a specific register within an I2C device.
  *
- * 	On the RPi, you likely need to install libi2c-dev.
+ *  This implementation is currently limited to 7-bit device addressing.
+ *
+ *  This implementation is currently limited to operating as the bus Master
+ *  on the Raspberry Pi.
+ *
+ *  Error handling could probably use some improvement, but given the target
+ *  usage in an embedded systems... what can really be done beyond rebooting
+ *  and hoping things go better in the next life.
  *
  * 	@section REFERENCES
  * 	https://pimylifeup.com/raspberry-pi-i2c/
  * 	https://www.kernel.org/doc/Documentation/i2c/dev-interface
+ * 	https://www.kernel.org/doc/Documentation/i2c/i2c-protocol
  *	https://learn.adafruit.com/working-with-i2c-devices/repeated-start
  *	https://android.googlesource.com/kernel/msm/+/f5335159eed416b26b7c8a5a4e8820f97dc1ad19/Documentation/i2c/dev-interface
+ *	https://gist.github.com/randhawp/29728350fef0c51f17eaff8b920bf5c8
  *
  *
  * @section MIT LICENSE
@@ -43,7 +64,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
-**/
+ **/
 
 #include <errno.h>
 #include <unistd.h>
@@ -53,8 +74,6 @@
 #include <linux/i2c-dev.h>
 
 #include "Pi2C.h"
-
-
 
 /**
  * Pi2c Constructor
@@ -73,7 +92,7 @@
  * I2C device address.
  *
  */
-Pi2C::Pi2C(char* busName, uint8_t addr){
+Pi2C::Pi2C(char *busName) {
 
 	//Open the I2C bus
 	fd = open(busName, O_RDWR); //Open the i2c file descriptor in read/write mode
@@ -81,89 +100,110 @@ Pi2C::Pi2C(char* busName, uint8_t addr){
 		throw errno;			//Whoopsie!
 	}
 
-	//Configure that file descriptor to access the desired I2C device on this bus
-	if (ioctl(fd, I2C_SLAVE, addr) < 0) { //Using ioctl set the i2c device to talk to address in the "addr" variable.
-		close(fd);
-		throw errno;
-	}
-
 } //I2C()
 
-
-
-
-
-//Destructor merely closes the handle
-Pi2C::~Pi2C(){
-	close(fd); 		//...Close it.
+//Destructor merely closes the file descriptor resource
+Pi2C::~Pi2C() {
+	close(fd); 					//Make the fd available for other activities
 } //~
-
-
-
-
 
 /**
  * Send one byte to an I2C device register over the bus accessed through the fd member
  *
+ * @param dev		7-bit address of the I2C device on this bus
  * @param reg		Target register
  * @param c			Byte to be written
- * @return			Number of bytes written or -1 if error
  * @throw			errno
  *
  * @section NOTES
  * Someday consider overloading sendRegister with a method passing the I2C device address as a parameter?
  *
  */
-void Pi2C::sendRegister(uint8_t reg, uint8_t c) {
-	if (i2c_smbus_write_byte_data(fd, reg, c) < 0) {
+void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint8_t c) {
+
+	uint8_t bfr[2];					//Bytes to send to dev
+
+	struct i2c_msg params[1];//I2C_RDWR parameters for a write to register operation
+	struct i2c_rdwr_ioctl_data req[1];	//I2C_RDWR request packet
+
+	//Build buffer of data to transmit to the device
+	bfr[0] = reg;					//Selects the destination register within the device
+	bfr[1] = c;						//Byte to send to that register
+
+	//Build ioctl's I2C_RDWR parameters to do a single write operation with 7-bit addressing
+	params[0].addr = dev;			//Specify which slave device to access
+	params[0].flags = 0;			//Write using 7-bit addressing
+	params[0].len = 2;				//Send 2 bytes (register number and data) to dev
+	params[0].buf = bfr;			//Pointer to the data buffer containing those bytes
+
+	//Build the ioctl I2C_RDWR request to send <reg,c> to dev on I2C bus accessed thru fd
+	req[0].msgs = params;
+	req[0].nmsgs = 1;
+	if (ioctl(fd, I2C_RDWR, &req) < 0) {
 		throw errno;
 	}
+
 } //sendRegister()
 
 
 
 
 
+
+
 /**
- * Read one byte from a designated register in the I2C device accessed through the fd member
+ * Read one byte from a designated register in an I2C device on this bus
  *
+ * @param dev		Read from this device
  * @param reg		Target register
- * @return			Number of bytes written or -1 if error
+ * @param pBfr		Pointer to a one byte buffer to receive the data
+ * @throw errno
  *
- * @section NOTES
- * Someday consider overloading sendRegister with a method passing the I2C device address as a parameter?
- *
-*/
-uint8_t Pi2C::readRegister(uint8_t reg) {
-	__s32 val = i2c_smbus_read_byte_data(fd, reg);
-	if (val < 0) {
+ */
+void Pi2C::readRegister(uint8_t dev, uint8_t reg, uint8_t *pBfr) {
+	uint8_t outBfr[1];							//Buffers for selecting the register and reading result
+	struct i2c_msg params[2];					//Parameters for the I2C_RDWR request
+	struct i2c_rdwr_ioctl_data req[1];			//The I2C_RDWR request
+
+	//Initialize outBfr to select the requested register in device
+	outBfr[0] = reg;							//Send register number *to* device
+
+	//Build ioctl I2C_RDWR parameters selecting a register to read from device
+	params[0].addr = dev;						//Specify slave device address
+	params[0].flags = 0;						//Write
+	params[0].len = 1;							//Send a single byte (register number)
+	params[0].buf = outbuf;						//Buffer containing the register number
+
+	//Build ioctl I2C_RDWR parameters to read from the previously selected register in device
+	params[1].addr = dev;						//Specify slave device address
+	params[1].flags = I2C_M_RD | I2C_M_NOSTART;	//Then read
+	params[1].len = 1;							//One byte
+	params[1].buf = pBfr;						//Place the read data in user's buffer
+
+	//The ioctl I2C_RDWR transaction
+	req[0].msgs = params;						//Parameters for combined write/read operation
+	req[0].nmsgs = 2;							//Two parts to this transaction
+	if (ioctl(i2c_fd, I2C_RDWR, &req) < 0) {
 		throw errno;
 	}
-	else return (uint8_t) val;
 
 } //readRegister()
 
 
 
 
-
 /**
- * Read one byte from a designated register in the I2C device accessed through the fd member
+ * Return one byte from a designated register in the I2C device accessed through the fd member
  *
- * @param reg		Target register
- * @param pBfr		Pointer to a one byte buffer to receive the data
+ * @param dev		Read from this I2C device
+ * @param reg		Target register in that device
+ * @throw errno
  *
- * @section NOTES
- * Someday consider overloading sendRegister with a method passing the I2C device address as a parameter?
- *
-*/
-void Pi2C::readRegister(uint8_t reg, uint8_t* pBfr) {
-	__s32 val = i2c_smbus_read_byte_data(fd, reg);
-	if (val < 0) {
-		throw errno;
-	}
-	*pBfr = (uint8_t) val;
-
+ */
+uint8_t Pi2C::readRegister(uint8_t dev, uint8_t reg) {
+	uint8_t c;
+	readRegister(dev, reg, &c);
+	return(c);
 } //readRegister()
 
 
@@ -174,6 +214,7 @@ void Pi2C::readRegister(uint8_t reg, uint8_t* pBfr) {
  * Delay execution of the calling thread
  *
  * @param mSec		Number of milliseconds for execution to be delayed
+ * @throw errno
  *
  * @section NOTES
  * This method doesn't actually access the I2C bus, but it's common for I2C devices to
@@ -182,24 +223,9 @@ void Pi2C::readRegister(uint8_t reg, uint8_t* pBfr) {
  */
 void Pi2C::delay(uint32_t mSec) {
 
-	if (usleep(mSec*1000L) < 0) {
+	if (usleep(mSec * 1000L) < 0) {
 		throw errno;
 	}
 
 } //delay()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

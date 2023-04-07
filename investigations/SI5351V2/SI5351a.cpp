@@ -2,6 +2,25 @@
  *
  * SI5351a --- A controller for the SI5351a synthesizer chip (Clk0, Clk1 and Clk2)
  *
+ * @section NOTES
+ * SI5351a controls a single SI5351a on a single I2C bus.
+ *
+ * The controller supports dynamic frequency adjustment (you can change the
+ * oscillators' frequencies --- it's not merely a quartz crystal replacement).
+ *
+ * The controller supports quadrature output from Clk0 and Clk1 as you might use
+ * in the local oscillator signal for a Tayloe detector.  You can specify which
+ * clock signal leads the other.
+ *
+ * The code attempts to minimize glitches in the SI5351a output arising from
+ * parameter changes.  Other considerations optimize performance within the
+ * ITU HF amateur radio bands though operation elsewhere is not prohibited.
+ * Lower frequency (i.e. MF and LF) operation has not been considered/tested
+ * with yasdr and may require adjustments to the final divider programming.
+ *
+ * The yasdr implementation was originally tested on a Raspberry Pi (RPi) 4
+ * supervised by bullseye in the HF (3..30 mHz) frequencies.
+ *
  * @section ATTRIBUTION
  * @author Hans Summers, 2015					http://www.hanssummers.com
  * @author Richard Tomlinson G4TGJ 2018/2019 	Eliminated float to just use 32 bit integers
@@ -35,8 +54,9 @@
 
 #include "Pi2C.h"
 
-//The I2C interface provides operating system independent access to the I2C bus
-Pi2C i2c;
+//Member variables for this SI5351a device located on this I2C bus
+Pi2C i2c;				//This bus
+uint8_t addr;			//This device
 
 // SI5351 internal register definitions
 #define SI_DEVICE_STATUS 0
@@ -107,7 +127,7 @@ static void si5351aOutputEnable(uint8_t clk, bool bEnable) {
 	uint8_t reg;
 
 	// Read the existing register
-	if (i2c.readRegister(SI_CLK_ENABLE, &reg) == 0) {
+	if (i2c.readRegister(addr,SI_CLK_ENABLE, &reg) == 0) {
 		if (bEnable) {
 			// Enable by clearing the bit
 			reg &= ~clk;
@@ -115,7 +135,7 @@ static void si5351aOutputEnable(uint8_t clk, bool bEnable) {
 			// Disable by setting the bit
 			reg |= clk;
 		}
-		i2c.sendRegister(SI_CLK_ENABLE, reg);
+		i2c.sendRegister(addr,SI_CLK_ENABLE, reg);
 	}
 } //si5351aOutputEnable()
 
@@ -127,7 +147,7 @@ static void si5351aOutputEnable(uint8_t clk, bool bEnable) {
 // Example: si5351aOutputOff(SI_CLK0_CONTROL);  //Will switch off output CLK0
 //
 static void si5351aOutputOff(uint8_t clk) {
-	i2c.sendRegister(clk, 0x80);// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
+	i2c.sendRegister(addr,clk, 0x80);// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
 
 } //si5351aOutputOff
 
@@ -148,12 +168,13 @@ static void si5351aOutputOff(uint8_t clk) {
  * Usage:  si5351Init("/dev/i2c-1",0x60,27000000,10)	//Select device 0x60 on I2C bus 1 with 27 mHz xtal
  */
 
-int si5351Init(char* busName, uint8_t addr, uint32_t fXtal, uint32_t cXtal) {
+int si5351Init(char* busName, uint8_t address, uint32_t fXtal, uint32_t cXtal) {
 	uint8_t regVal;
 	int i;
 
 	//Build an interface to the I2C bus hosting the SI5351
-	i2c = new Pi2C(busName, addr);
+	i2c = new Pi2C(busName);	//Remember this I2C bus
+	addr = address;				//Remember I2C address of this SI5351 on that bus
 
 	//Remember the SI5351a crystal frequency (as it likely isn't *exactly* 27mHz)
 	xtalFreq = fXtal;		//Hz
@@ -162,7 +183,7 @@ int si5351Init(char* busName, uint8_t addr, uint32_t fXtal, uint32_t cXtal) {
 	for (i = 0; i < MAX_INIT_TRIES; i++) {
 
 		// Poll the device status register until the system init bit clears
-		if ((i2c.readRegister(SI_DEVICE_STATUS, &regVal) == 0) && !(regVal & SYS_INIT)) {
+		if ((i2c.readRegister(addr,SI_DEVICE_STATUS, &regVal) == 0) && !(regVal & SYS_INIT)) {
 			break;
 		}
 
@@ -184,7 +205,7 @@ int si5351Init(char* busName, uint8_t addr, uint32_t fXtal, uint32_t cXtal) {
 		si5351aOutputOff(SI_CLK2_CONTROL);
 
 		// Set the crystal load capacitance
-		i2c.sendRegister(SI_XTAL_LOAD, cXtal);
+		i2c.sendRegister(addr,SI_XTAL_LOAD, cXtal);
 	}
 
 	return 0;
@@ -262,7 +283,7 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
 			// Write changed registers and always register 7. It appears that writing
 			// this last register latches in the new values.
 			if (i == 7 || (newPll[pll][i] != prevPll[pll][i])) {
-				i2c.sendRegister(synthPLL[pll] + i, newPll[pll][i]);
+				i2c.sendRegister(addr,synthPLL[pll] + i, newPll[pll][i]);
 				prevPll[pll][i] = newPll[pll][i];
 			}
 		} //for
@@ -301,15 +322,15 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
 		Div4 = 0x0c;
 	}
 
-	i2c.sendRegister(synth + 0, (P3 & 0x0000FF00) >> 8);
-	i2c.sendRegister(synth + 1, (P3 & 0x000000FF));
-	i2c.sendRegister(synth + 2, ((P1 & 0x00030000) >> 16) | rDiv | Div4);
-	i2c.sendRegister(synth + 3, (P1 & 0x0000FF00) >> 8);
-	i2c.sendRegister(synth + 4, (P1 & 0x000000FF));
-	i2c.sendRegister(synth + 5,
+	i2c.sendRegister(addr,synth + 0, (P3 & 0x0000FF00) >> 8);
+	i2c.sendRegister(addr,synth + 1, (P3 & 0x000000FF));
+	i2c.sendRegister(addr,synth + 2, ((P1 & 0x00030000) >> 16) | rDiv | Div4);
+	i2c.sendRegister(addr,synth + 3, (P1 & 0x0000FF00) >> 8);
+	i2c.sendRegister(addr,synth + 4, (P1 & 0x000000FF));
+	i2c.sendRegister(addr,synth + 5,
 			((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
-	i2c.sendRegister(synth + 6, (P2 & 0x0000FF00) >> 8);
-	i2c.sendRegister(synth + 7, (P2 & 0x000000FF));
+	i2c.sendRegister(addr,synth + 6, (P2 & 0x0000FF00) >> 8);
+	i2c.sendRegister(addr,synth + 7, (P2 & 0x000000FF));
 } //setupMultisynth
 
 
@@ -626,19 +647,19 @@ void si5351setFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 		// Set quadrature mode if applicable (only for clock 0 or clock 1)
 		if (clock != 2) {
 			if (quadrature < 0) {
-				i2c.sendRegister(SI_CLK0_PHOFF, 0);
-				i2c.sendRegister(SI_CLK1_PHOFF, a);
+				i2c.sendRegister(addr,SI_CLK0_PHOFF, 0);
+				i2c.sendRegister(addr,SI_CLK1_PHOFF, a);
 			} else if (quadrature > 0) {
-				i2c.sendRegister(SI_CLK0_PHOFF, a);
-				i2c.sendRegister(SI_CLK1_PHOFF, 0);
+				i2c.sendRegister(addr,SI_CLK0_PHOFF, a);
+				i2c.sendRegister(addr,SI_CLK1_PHOFF, 0);
 			} else {
-				i2c.sendRegister(SI_CLK0_PHOFF, 0);
-				i2c.sendRegister(SI_CLK1_PHOFF, 0);
+				i2c.sendRegister(addr,SI_CLK0_PHOFF, 0);
+				i2c.sendRegister(addr,SI_CLK1_PHOFF, 0);
 			}
 		}
 
 		// Switch on the clock
-		i2c.sendRegister(SI_CLK0_CONTROL + clock, 0x4F | pll_clock);
+		i2c.sendRegister(addr,SI_CLK0_CONTROL + clock, 0x4F | pll_clock);
 
 		// If we are setting clock 0 then we need to also set the multisynth divider for
 		// clock 1 because it also uses PLL A
@@ -654,7 +675,7 @@ void si5351setFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 		if (a != prevDivider[clock]) {
 			// Reset the PLLs. This causes a glitch in the output. For small changes to
 			// the parameters, you don't need to reset the PLL, and there is no glitch
-			i2c.sendRegister(SI_PLL_RESET, pll_reset);
+			i2c.sendRegister(addr,SI_PLL_RESET, pll_reset);
 
 			prevDivider[clock] = a;
 		}

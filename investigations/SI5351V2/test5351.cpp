@@ -9,7 +9,7 @@ int main(void)
 		printf("si5351Init failed\n");
 	}
 
-	//Start the oscillator
+	//Start the Clk0 oscillator at 10 mHz without quadrature
 	si5351setFrequency(0, 10000000, 0);
 
 	return 0;
