@@ -26,21 +26,18 @@
 #include <unistd.h>   /* For open(), */
 #include <sys/ioctl.h>
 
-class I2C {
-		int fd;					//Linux file descriptor
+class Pi2C {
 
-	public:
-		I2C(char,uint8_t);
-		~I2C();
-		
-		void beginTransmission(uint8_t);
-		int endTransmission(void);
-		int endTransmission(bool);
+private:
+		int fd;							//Linux file descriptor accessing the I2C slave device
 
-		int read(char *data,size_t length);
-		size_t write(uint8_t);
-	    size_t write(const uint8_t*, size_t);
-	    size_t sendRegister(uint8_t,uint8_t);
+public:
+		Pi2C(char *, uint8_t);			//Constructor
+		~Pi2C();						//Destruction
+
+
+		int sendRegister(uint8_t, uint8_t);
+
 
 		
 };

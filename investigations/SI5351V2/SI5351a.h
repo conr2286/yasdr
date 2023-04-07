@@ -27,6 +27,7 @@
 #define XTAL_FREQ	27000000			// Crystal frequency
 
 #define SI_I2C_ADDR	0x60				//SI5351a I2C Address
+#define NUM_CLOCKS 3					//SI5351a has 3 clock outputs
 
 
 void si5351OutputOff(uint8_t clk);
