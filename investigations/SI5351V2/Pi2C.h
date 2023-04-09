@@ -37,6 +37,8 @@ public:
 
 
 		void sendRegister(uint8_t, uint8_t, uint8_t);
+		void sendRegister(uint8_t dev, uint8_t reg, uint32_t count, uint8_t* c);
+
 		uint8_t readRegister(uint8_t, uint8_t);
 		void readRegister(uint8_t, uint8_t, uint8_t*);
 		

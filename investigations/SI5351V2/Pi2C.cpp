@@ -152,6 +152,52 @@ void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint8_t c) {
 
 
 
+/**
+ * Send count bytes to I2C device register(s) over the bus accessed through the fd member
+ *
+ * @param dev		7-bit address of the I2C device on this bus
+ * @param reg		Target register
+ * @param count		Number of bytes to send
+ * @param c			Pointer to first byte in an array of bytes to send
+ * @throw			errno
+ *
+ * Note:  The target I2C device must support burst data transfer with auto register
+ * address increments in order to accept a block of data from us.
+ *
+ */
+void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint32_t count, uint8_t* c) {
+
+	uint8_t bfr[2];					//Bytes to send to dev
+
+	struct i2c_msg params[2];			//I2C_RDWR parameters for a write to register operation
+	struct i2c_rdwr_ioctl_data req[1];	//I2C_RDWR request packet
+
+	//Build first buffer of data to transmit to the device
+	bfr[0] = reg;					//Selects the destination register within the device
+
+	//Build ioctl's I2C_RDWR parameters to do a write operation with 7-bit addressing
+	params[0].addr = dev;			//Specify which slave device to access
+	params[0].flags = 0;			//Write using 7-bit addressing
+	params[0].len = 1;				//Send 2 bytes (register number and data) to dev
+	params[0].buf = bfr;			//Pointer to the data buffer containing those bytes
+
+	//Build ioctl I2C_RDWR parameters to write user's data to the device
+	params[1].addr = dev;				//Specify slave device address
+	params[1].flags = I2C_M_NOSTART;	//Continue writing more data
+	params[1].len = count;				//Number of bytes to send
+	params[1].buf = c;					//Place the read data in user's buffer
+
+	//Build the ioctl I2C_RDWR request to send <reg,c> to dev on I2C bus accessed thru fd
+	req[0].msgs = params;
+	req[0].nmsgs = 2;				//Send two chunks to device
+	if (ioctl(fd, I2C_RDWR, &req) < 0) {
+		throw errno;
+	}
+
+} //sendRegister()
+
+
+
 
 
 /**
