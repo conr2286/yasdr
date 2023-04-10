@@ -531,7 +531,7 @@ void si5351setFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 // Whether quadrature has been enabled
 	static int8_t quadrature;
 
-	printf("si5351setFrequency(%u,%u,%u)\n",clock,frequency,q);
+	//printf("si5351setFrequency(%u,%u,%u)\n",clock,frequency,q);
 
 // To get the output frequency the PLL is divided by a+b/c
 	uint32_t a, b, c;
