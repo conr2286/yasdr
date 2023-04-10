@@ -275,6 +275,7 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
 		for (int i = 0; i < NUM_PLL_BYTES; i++) {
 			// It appears that writing register 7 latches in the new values.
 			if (i == 7 || (newPll[pll][i] != prevPll[pll][i])) {
+				printf("Writing SI5351a reg %u\n",synthPLL[pll]+i);
 				i2c->sendRegister(addr, synthPLL[pll] + i, newPll[pll][i]);
 				prevPll[pll][i] = newPll[pll][i];
 			}
