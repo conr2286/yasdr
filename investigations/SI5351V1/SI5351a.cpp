@@ -10,13 +10,13 @@
 #include "Pi2c.h"
 #include "SI5351a.h"
 
-Pi2c si5351;
+Pi2c* si5351;
 
 //
 // Initialize communication with the SI5351
 void si5351Init(char bus) {
 	si5351 = new Pi2c(bus);
-	si5351.beginTransmission(SI_I2C_ADDR);
+	si5351->beginTransmission(SI_I2C_ADDR);
 }
 
 //
@@ -37,14 +37,14 @@ void si5351SetupPLL(uint8_t pll, uint8_t mult, uint32_t num, uint32_t denom)
 	P2 = (uint32_t)(128 * num - denom * P2);
 	P3 = denom;
 
-	si5351.sendRegister(pll + 0, (P3 & 0x0000FF00) >> 8);
-	si5351.sendRegister(pll + 1, (P3 & 0x000000FF));
-	si5351.sendRegister(pll + 2, (P1 & 0x00030000) >> 16);
-	si5351.sendRegister(pll + 3, (P1 & 0x0000FF00) >> 8);
-	si5351.sendRegister(pll + 4, (P1 & 0x000000FF));
-	si5351.sendRegister(pll + 5, ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
-	si5351.sendRegister(pll + 6, (P2 & 0x0000FF00) >> 8);
-	si5351.sendRegister(pll + 7, (P2 & 0x000000FF));
+	si5351->sendRegister(pll + 0, (P3 & 0x0000FF00) >> 8);
+	si5351->sendRegister(pll + 1, (P3 & 0x000000FF));
+	si5351->sendRegister(pll + 2, (P1 & 0x00030000) >> 16);
+	si5351->sendRegister(pll + 3, (P1 & 0x0000FF00) >> 8);
+	si5351->sendRegister(pll + 4, (P1 & 0x000000FF));
+	si5351->sendRegister(pll + 5, ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
+	si5351->sendRegister(pll + 6, (P2 & 0x0000FF00) >> 8);
+	si5351->sendRegister(pll + 7, (P2 & 0x000000FF));
 }
 
 //
@@ -61,14 +61,14 @@ void si5351SetupMultisynth(uint8_t synth, uint32_t divider, uint8_t rDiv)
 	P2 = 0;							// P2 = 0, P3 = 1 forces an integer value for the divider
 	P3 = 1;
 
-	si5351.sendRegister(synth + 0,   (P3 & 0x0000FF00) >> 8);
-	si5351.sendRegister(synth + 1,   (P3 & 0x000000FF));
-	si5351.sendRegister(synth + 2,   ((P1 & 0x00030000) >> 16) | rDiv);
-	si5351.sendRegister(synth + 3,   (P1 & 0x0000FF00) >> 8);
-	si5351.sendRegister(synth + 4,   (P1 & 0x000000FF));
-	si5351.sendRegister(synth + 5,   ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
-	si5351.sendRegister(synth + 6,   (P2 & 0x0000FF00) >> 8);
-	si5351.sendRegister(synth + 7,   (P2 & 0x000000FF));
+	si5351->sendRegister(synth + 0,   (P3 & 0x0000FF00) >> 8);
+	si5351->sendRegister(synth + 1,   (P3 & 0x000000FF));
+	si5351->sendRegister(synth + 2,   ((P1 & 0x00030000) >> 16) | rDiv);
+	si5351->sendRegister(synth + 3,   (P1 & 0x0000FF00) >> 8);
+	si5351->sendRegister(synth + 4,   (P1 & 0x000000FF));
+	si5351->sendRegister(synth + 5,   ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
+	si5351->sendRegister(synth + 6,   (P2 & 0x0000FF00) >> 8);
+	si5351->sendRegister(synth + 7,   (P2 & 0x000000FF));
 }
 
 //
@@ -78,7 +78,7 @@ void si5351SetupMultisynth(uint8_t synth, uint32_t divider, uint8_t rDiv)
 //
 void si5351OutputOff(uint8_t clk)
 {
-	si5351.sendRegister(clk, 0x80);		// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
+	si5351->sendRegister(clk, 0x80);		// Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
 }
 
 // 
@@ -126,9 +126,9 @@ void si5351SetFrequency(uint32_t frequency)
 	si5351SetupMultisynth(SI_SYNTH_MS_0, divider, SI_R_DIV_1);
 									// Reset the PLL. This causes a glitch in the output. For small changes to 
 									// the parameters, you don't need to reset the PLL, and there is no glitch
-	si5351.sendRegister(SI_PLL_RESET, 0xA0);
+	si5351->sendRegister(SI_PLL_RESET, 0xA0);
 									// Finally switch on the CLK0 output (0x4F)
 									// and set the MultiSynth0 input to be PLL A
-	si5351.sendRegister(SI_CLK0_CONTROL, 0x4F | SI_CLK_SRC_PLL_A);
+	si5351->sendRegister(SI_CLK0_CONTROL, 0x4F | SI_CLK_SRC_PLL_A);
 }
 
