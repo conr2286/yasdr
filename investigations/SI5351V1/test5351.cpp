@@ -1,4 +1,5 @@
 #include <time.h>
+#include <stdio.h>
 #include "si5351a.h"
 
 
@@ -13,8 +14,8 @@ int main(void)
 	int count=1000;
 	time_t t0 = time(NULL);
 	for (int i=0; i<count; i++) {
-		si5351setFrequency(1000000);
-		si5351setFrequency(1000050);
+		si5351SetFrequency(1000000);
+		si5351SetFrequency(1000050);
 	}
 	time_t t1 = time(NULL);
 	float t = ((float)(t1-t0))/count;

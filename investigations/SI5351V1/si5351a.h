@@ -32,5 +32,6 @@
 
 void si5351OutputOff(uint8_t clk);
 void si5351SetFrequency(uint32_t frequency);
+void si5351Init(char);
 
 #endif //SI5351A_H
