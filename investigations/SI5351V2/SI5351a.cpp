@@ -271,10 +271,9 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
 		newPll[pll][6] = (P2 & 0x0000FF00) >> 8;
 		newPll[pll][7] = (P2 & 0x000000FF);
 
-		// Write those registers that have changed
+		// Write only those registers that have changed and then register 7
 		for (int i = 0; i < NUM_PLL_BYTES; i++) {
-			// Write changed registers and always register 7. It appears that writing
-			// this last register latches in the new values.
+			// It appears that writing register 7 latches in the new values.
 			if (i == 7 || (newPll[pll][i] != prevPll[pll][i])) {
 				i2c->sendRegister(addr, synthPLL[pll] + i, newPll[pll][i]);
 				prevPll[pll][i] = newPll[pll][i];
@@ -282,6 +281,11 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
 		} //for
 	} //if
 } //setupPLL
+
+
+
+
+
 
 /**
  * Set up MultiSynth with divider a+b/c and R divider
@@ -312,6 +316,19 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
 		Div4 = 0x0c;
 	}
 
+#define BURST_MODE	0				//Burst mode investigation
+#if	BURST_MODE
+	uint8_t	msVals[8] = {(P3 & 0x0000FF00) >> 8,
+						 (P3 & 0x000000FF),
+						 ((P1 & 0x00030000) >> 16) | rDiv | Div4,
+						 (P1 & 0x0000FF00) >> 8,
+						 (P1 & 0x000000FF),
+						 ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16),
+						 (P2 & 0x0000FF00) >> 8,
+						 (P2 & 0x000000FF)
+						};
+	i2c->sendRegister(addr, synth + 0, 8, msVals);
+#else
 	i2c->sendRegister(addr, synth + 0, (P3 & 0x0000FF00) >> 8);
 	i2c->sendRegister(addr, synth + 1, (P3 & 0x000000FF));
 	i2c->sendRegister(addr, synth + 2, ((P1 & 0x00030000) >> 16) | rDiv | Div4);
@@ -321,6 +338,8 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
 			((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
 	i2c->sendRegister(addr, synth + 6, (P2 & 0x0000FF00) >> 8);
 	i2c->sendRegister(addr, synth + 7, (P2 & 0x000000FF));
+#endif
+
 } //setupMultisynth
 
 
