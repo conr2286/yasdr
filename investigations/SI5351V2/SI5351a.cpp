@@ -183,7 +183,7 @@ int si5351Init(const char *busName, uint8_t address, uint32_t fXtal, uint32_t cX
 
 		// Poll the device status register until the system init bit clears
 		regVal = i2c->readRegister(addr, SI_DEVICE_STATUS);
-		printf("SI_DEVICE_STATUS=0x%x\n",regVal);
+		printf("DEBUG SI_DEVICE_STATUS=0x%x\n",regVal);
 
 	} while ((i++<MAX_INIT_TRIES)&&((regVal&SYS_INIT) != 0));
 
@@ -276,7 +276,7 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
 		for (int i = 0; i < NUM_PLL_BYTES; i++) {
 			// It appears that writing register 7 latches in the new values.
 			if (i == 7 || (newPll[pll][i] != prevPll[pll][i])) {
-				printf("Writing SI5351a reg %u\n",synthPLL[pll]+i);
+				//printf("Writing SI5351a reg %u\n",synthPLL[pll]+i);
 				i2c->sendRegister(addr, synthPLL[pll] + i, newPll[pll][i]);
 				prevPll[pll][i] = newPll[pll][i];
 			}
