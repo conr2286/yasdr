@@ -23,7 +23,7 @@ int main(void)
 	si5351ClockEnable(1,true);
 
 	//Time minor changes in Clk2 frequency
-	unsigned count=10000;
+	int count=10000;
 	time_t t0 = time(NULL);
 	for (int i=0; i<count; i++) {
 		si5351setFrequency(2, 1000000, 0);
@@ -31,7 +31,7 @@ int main(void)
 	}
 	time_t t1 = time(NULL);
 	float t = ((float)(t1-t0))/count;
-	printf("t=%d seconds\n",t);
+	printf("t=%f seconds\n",t);
 
 	return 0;
 }
