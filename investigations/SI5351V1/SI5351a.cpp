@@ -8,7 +8,7 @@
 //
 #include <inttypes.h>
 #include "Pi2c.h"
-#include "si5351a.h"
+#include "SI5351a.h"
 
 Pi2c si5351;
 

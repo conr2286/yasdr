@@ -1,6 +1,6 @@
 #include <time.h>
 #include <stdio.h>
-#include "si5351a.h"
+#include "SI5351a.h"
 
 
 int main(void)
