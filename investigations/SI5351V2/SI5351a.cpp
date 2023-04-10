@@ -183,6 +183,7 @@ int si5351Init(const char *busName, uint8_t address, uint32_t fXtal, uint32_t cX
 
 		// Poll the device status register until the system init bit clears
 		regVal = i2c->readRegister(addr, SI_DEVICE_STATUS);
+		printf("SI_DEVICE_STATUS=0x%x\n",regVal);
 
 	} while ((i++<MAX_INIT_TRIES)&&((regVal&SYS_INIT) != 0));
 
