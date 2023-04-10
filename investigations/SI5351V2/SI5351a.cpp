@@ -316,7 +316,7 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
 		Div4 = 0x0c;
 	}
 
-#define BURST_MODE	0				//Burst mode investigation
+#define BURST_MODE	1				//Burst mode investigation
 #if	BURST_MODE
 	uint8_t	msVals[8] = {(P3 & 0x0000FF00) >> 8,
 						 (P3 & 0x000000FF),
