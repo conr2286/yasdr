@@ -1,28 +1,19 @@
-CFLAGS = -Wall -std=c17
-CPPFLAGS = -Wall -std=c++20
-PGM = test5351
-OBJS = test5351.o si5351a.o Pi2c.o
+#Makefile for test5351
 
+CXX=g++
+CXXFLAGS=-O -std=c++17 -Wall
 
+OBJS=test5351.o SI5351a.o Pi2C.o
+HDRS=SI5351a.h Pi2C.h
 
-#-----Build make's *.d files before building the product
-all:  rules.d $(PGM)
+.cpp.o:
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-#-----Builds a debug version of the product (must follow make clean)
-debug: CFLAGS += -O0 -g
-debug: CPPFLAGS += -O0 -g
-debug: rules.d $(PGM) 
-
-#-----Rebuild the dependency (*.d) files from their sources
-rules.d: Makefile $(wildcard *.cpp) $(wildcard *.c) $(wildcard *.h)
-	gcc -MM $(wildcard *.cpp) $(wildcard *.c) >rules.d
-
-#-----Include the header dependency rules into this Makefile
--include rules.d
-
-#-----Rebuild the product
-$(PGM): $(OBJS) Makefile
-	gcc $(OBJS)  -o $@
+all:	test5351
+ 
+test5351: $(OBJS) $(HDRS) Makefile
+	$(CXX) $(CXXFLAGS) $(OBJS) -o test5351
 
 clean:
-	rm -f *.o $(PGM)  *~ *.d
+	rm -f $(OBJS) test5351
+	
