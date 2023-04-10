@@ -3,8 +3,8 @@
 CXX=g++
 CXXFLAGS=-O -std=c++17 -Wall
 
-OBJS=test5351.o SI5351a.o Pi2C.o
-HDRS=SI5351a.h Pi2C.h
+OBJS=test5351.o SI5351a.o Pi2c.o
+HDRS=SI5351a.h Pi2c.h
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $< -o $@
