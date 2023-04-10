@@ -19,7 +19,7 @@
  * warranty  of  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
-**/
+ **/
 #include "Pi2c.h"
 #include <iostream>
 
@@ -30,26 +30,23 @@
  *
  * Usage:  Pi2c(60,'1');			//Device 60 on RPi I2C bus 1 (GPIO 2 and 3)
  *
- * Note:  At this time, Pi2C joins the bus only as a controller, not as a slave.
+ * Note:  At this time, Pi2c joins the bus only as a controller, not as a slave.
  */
-Pi2c::Pi2c(char bus){
+Pi2c::Pi2c(char bus) {
 
 	//Set up the filename of the I2C Bus. Choose appropriate bus for Raspberry Pi
 	char filename[11] = "/dev/i2c-";
 	filename[9] = bus;
 	filename[10] = 0; //Add the null character onto the end of the array to make it a string
-	
+
 	fd = open(filename, O_RDWR); //Open the i2c file descriptor in read/write mode
 	if (fd < 0) {
 		std::cout << "Can't open I2C BUS" << std::endl; //If there's an error opening this, then display it.
 	}
 } //Pi2c()
 
-
-
-
 /**
- * Pi2C Begin Transmission to the specified device
+ * Pi2c Begin Transmission to the specified device
  *
  * @param address	I2C bus address of the slave device
  *
@@ -64,10 +61,8 @@ void Pi2c::beginTransmission(uint8_t address) {
 	}
 }
 
-
-
 /**
- * Pi2C End Transmission (a NOP)
+ * Pi2c End Transmission (a NOP)
  *
  *
  * Usage:  	endTransmission();			//Doesn't actually do anything at all
@@ -83,15 +78,13 @@ int Pi2c::endTransmission(bool x) {
 	return 0;
 }
 
-
 //Destructor merely closes the handle
-Pi2c::~Pi2c(){
-	if (fd){ 			//If the I2C File handle is still open...
+Pi2c::~Pi2c() {
+	if (fd) { 			//If the I2C File handle is still open...
 		close(fd); 		//...Close it.
 		fd = 0;			//Remember it closed
 	}
 }
-
 
 /**
  * Read count into bfr from I2C device
@@ -100,8 +93,8 @@ Pi2c::~Pi2c(){
  * @param count		Number of bytes to read
  * @return			Number of bytes read or -1 if error
  */
-int Pi2c::read(char *bfr,size_t count){
-	int er = ::read(fd,bfr,count); //Read count number of bytes into bfr from the I2C bus.
+int Pi2c::read(char *bfr, size_t count) {
+	int er = ::read(fd, bfr, count); //Read count number of bytes into bfr from the I2C bus.
 	return er;
 }
 
@@ -113,13 +106,10 @@ int Pi2c::read(char *bfr,size_t count){
  * @return			Number of bytes written or -1 if error
  *
  */
-size_t Pi2c::write(const uint8_t *bfr,size_t count){
-	int er = ::write(fd,bfr,count);	//Write count bytes from bfr to I2C device
+size_t Pi2c::write(const uint8_t *bfr, size_t count) {
+	int er = ::write(fd, bfr, count);//Write count bytes from bfr to I2C device
 	return er;
 }
-
-
-
 
 /**
  * Write one byte to I2C device
@@ -128,13 +118,10 @@ size_t Pi2c::write(const uint8_t *bfr,size_t count){
  * @return			Number of bytes written or -1 if error
  *
  */
-size_t Pi2c::write(uint8_t c){
-	int er = ::write(fd,&c,1);	//Write 1 byte from c to I2C device
+size_t Pi2c::write(uint8_t c) {
+	int er = ::write(fd, &c, 1);	//Write 1 byte from c to I2C device
 	return er;
 }
-
-
-
 
 /**
  * Send one byte to an I2C device register
@@ -143,9 +130,10 @@ size_t Pi2c::write(uint8_t c){
  * @return			Number of bytes written or -1 if error
  *
  */
-size_t Pi2c::sendRegister(uint8_t reg, uint8_t c){
+size_t Pi2c::sendRegister(uint8_t reg, uint8_t c) {
 	uint8_t bfr[2];
-	bfr[0] = reg;  bfr[1] = c;
-	int er = ::write(fd,bfr,2);		//Write register's number followed by the data byte
+	bfr[0] = reg;
+	bfr[1] = c;
+	int er = ::write(fd, bfr, 2);//Write register's number followed by the data byte
 	return er;
 }
