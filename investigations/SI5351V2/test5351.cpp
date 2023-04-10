@@ -23,7 +23,7 @@ int main(void)
 	si5351ClockEnable(1,true);
 
 	//Time minor changes in Clk2 frequency
-	int count=10000;
+	int count=1000;
 	time_t t0 = time(NULL);
 	for (int i=0; i<count; i++) {
 		si5351setFrequency(2, 1000000, 0);
