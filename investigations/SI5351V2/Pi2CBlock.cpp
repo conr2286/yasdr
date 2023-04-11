@@ -24,6 +24,7 @@
  * device in sorted order, using burst mode when the requests target registers
  * in sequential order, else their data will be flushed through individual
  * transactions.
+ *
  */
 Pi2CBlock::Pi2CBlock(Pi2C* i2C, uint8_t addr) {
 	i2cDevice = addr;					//Remember the target device address
@@ -38,12 +39,26 @@ Pi2CBlock::Pi2CBlock(Pi2C* i2C, uint8_t addr) {
 /**
  *  Buffer <reg,data> to later send to i2cDevice
  *
+ *  @param reg	I2C device register
+ *  @param data	Value to write to that register
+ *
  *  All requests to sendRegister() address the same device in this object.
  *  Each request consists of a <reg,data> tuple and may appear in any order (they
  *  need not be sequential registers).  Even gaps in the register sequence are
  *  permitted.  The data is actually sent to the device after close().
+ *
+ *  Note:  all invocations of sendRegister() by this object address the same
+ *  I2C device configured in the constructor.
+ *
+ *  Caution:  Register data is written to the I2C device in sequential (by reg
+ *  number) order, not the invocation order of sendRegister().  While this can
+ *  improve performance over the I2C bus (through use of burst mode writes),
+ *  some devices may require their register values to be assigned in invocation
+ *  order, not in sequential register order.
  */
 void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
+
+	printf("sendRegister(%u,%u\n)",reg,data);
 
 	//Build new <reg,data> tuple
 	Pi2CRegData *newTuple = new (Pi2CRegData);
@@ -58,7 +73,7 @@ void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
 		return;
 	}
 
-	//We don't actually send the register to the device until the block is closed.
+	//We don't actually send the register to the device until the reg block is closed.
 	//All we do now is insert it into the ordered list of <reg,data> tuples.
 	Pi2CRegData *curTuple = first;
 	while (curTuple->next != NULL) {
@@ -73,6 +88,8 @@ void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
 	}
 
 	//Exited loop with curTuple referencing the tuple to proceed newTuple.
+	if (curTuple->next==NULL) printf("Inserted at end of existing list\n");
+	else printf("Inserted into midst of existing list\n");
 	newTuple->next = curTuple->next;
 	curTuple->next = newTuple;
 	count++;
@@ -85,6 +102,12 @@ void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
 /**
  *  Close a block of <reg,data> tuples
  *
+ *  The <reg,data> tuples appear in an ordered (by reg number) list.  Note
+ *  that the list may have gaps.  The idea is to use burst mode to write
+ *  blocks of sequential (no gap) data to the I2C device.  If all the
+ *  tuples are sequential, then a single burst write will service the
+ *  entire list.  If there are gaps, then multiple writes will be required.
+ *
  */
 void Pi2CBlock::close() {
 
@@ -95,14 +118,17 @@ void Pi2CBlock::close() {
 	uint8_t bfr[] = malloc(count);		//It's an array of bytes
 
 	//Outer loop walks the list, assembling one block of sequential data into the buffer
-	Pi2CRegData* curTuple = first;		//
+	Pi2CRegData* curTuple = first;		//Begin examining list at first tuple
+	printf("Closing an existing reg block list\n");
 	while(curTuple!=NULL) {
 
 		//Start filling the buffer
+		printf("Start filling bfr[] at reg %u\n",curTuple->reg);
 		uint8_t firstReg = curTuple->reg;		//Register number of first tuple in bfr
 		uint8_t nextReg  = firstReg+1;			//Number of next expected register following curTuple
 		unsigned n = 0;							//Buffer is currently empty
 		do {
+			printf("Filling bfr[%u] for reg %u with %u\n",n,curTuple->reg,curTuple->data);
 			bfr[n++] = curTuple->data;			//Buffer a byte of data from this tuple
 			curTuple = curTuple->next;			//Now consider the following tuple if any
 			if (curTuple == NULL) break;		//End of list?
@@ -110,12 +136,12 @@ void Pi2CBlock::close() {
 
 		//Loop exited when bfr has n bytes of sequential data starting at firstReg
 		i2c->sendRegister(i2cDevice,firstReg,n,bfr);	//Burst write bfr to firstReg in device addr
-		printf("send %u bytes at reg %u\n",n,firstReg);
-
-		//Free the buffer
-		free(bfr);
+		printf("Sent %u bytes at reg %u\n",n,firstReg);
 
 	} //Outer loop
+
+	//Free the buffer after processing the entire tuple list
+	free(bfr);
 
 } //close()
 

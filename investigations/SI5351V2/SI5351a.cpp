@@ -21,6 +21,10 @@
  * The yasdr implementation was originally tested on a Raspberry Pi (RPi) 4
  * supervised by bullseye in the HF (3..30 mHz) frequencies.
  *
+ * @section BUGS
+ * The Pi2C object is never freed.  This seems satisfactory for an embedded design
+ * but should be addressed someday.
+ *
  * @section ATTRIBUTION
  * @author Hans Summers, 2015					http://www.hanssummers.com
  * @author Richard Tomlinson G4TGJ 2018/2019 	Eliminated float to just use 32 bit integers
