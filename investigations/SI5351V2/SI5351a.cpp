@@ -273,15 +273,18 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
 		newPll[pll][7] = (P2 & 0x000000FF);
 
 		// Write only those registers that have changed and then register 7
+		Pi2CBlock* block = Pi2CBlock(i2c, addr);			//An optimized block of regs sent to addr
 		for (int i = 0; i < NUM_PLL_BYTES; i++) {
 			// It appears that writing register 7 latches in the new values.
 			if (i == 7 || (newPll[pll][i] != prevPll[pll][i])) {
-				printf("Writing SI5351a reg %u\n",synthPLL[pll]+i);
-				i2c->sendRegister(addr, synthPLL[pll] + i, newPll[pll][i]);
+				//printf("Writing SI5351a reg %u\n",synthPLL[pll]+i);
+				//i2c->sendRegister(addr, synthPLL[pll] + i, newPll[pll][i]);
+				block->sendRegister(rsynthPll[pll]+i, newPll[pll][i]); //Add to reg block
 				prevPll[pll][i] = newPll[pll][i];
 			}
 		} //for
-		printf("\n");
+		block->close();				//Flush any unsent data to regs in addr
+		//printf("\n");
 	} //if
 } //setupPLL
 

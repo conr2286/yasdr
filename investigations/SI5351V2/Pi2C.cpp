@@ -119,8 +119,7 @@ Pi2C::~Pi2C() {
  * @throw			errno
  *
  * @section NOTES
- * Someday consider overloading sendRegister with a method passing the I2C device address as a parameter?
- *
+  *
  */
 void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint8_t c) {
 
