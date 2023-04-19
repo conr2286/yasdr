@@ -4,7 +4,8 @@
  *  Created on: Apr 10, 2023
  *      Author: jconrad
  */
-
+#include <cstdlib>
+#include <memory>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -58,7 +59,7 @@ Pi2CBlock::Pi2CBlock(Pi2C* i2C, uint8_t addr) {
  */
 void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
 
-	printf("sendRegister(%u,%u\n)",reg,data);
+	printf("Pi2CBlock::sendRegister(%u,%u\n)",reg,data);
 
 	//Build new <reg,data> tuple
 	Pi2CRegData *newTuple = new (Pi2CRegData);
@@ -115,7 +116,7 @@ void Pi2CBlock::close() {
 	if (count==0) return;
 
 	//Construct a buffer large enough to hold all of the data from the tuple list
-	uint8_t bfr[] = malloc(count);		//It's an array of bytes
+	uint8_t* bfr = (uint8_t *)malloc(count);		//It's an array of bytes
 
 	//Outer loop walks the list, assembling one block of sequential data into the buffer
 	Pi2CRegData* curTuple = first;		//Begin examining list at first tuple
@@ -135,6 +136,7 @@ void Pi2CBlock::close() {
 		} while(curTuple->reg==nextReg++);		//No, does this following tuple belong in bufr?
 
 		//Loop exited when bfr has n bytes of sequential data starting at firstReg
+		printf("sendRegister(%u,%u,%u,bfr)\n",i2cDevice,firstReg,n);
 		i2c->sendRegister(i2cDevice,firstReg,n,bfr);	//Burst write bfr to firstReg in device addr
 		printf("Sent %u bytes at reg %u\n",n,firstReg);
 

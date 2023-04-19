@@ -18,12 +18,12 @@ struct Pi2CRegData {
 
 class Pi2CBlock {
 	uint8_t i2cDevice;					//7-bit I2C device address
-	Pi2CRegData first;					//Ordered list of <reg,data> tuples
+	Pi2CRegData* first;					//Ordered list of <reg,data> tuples
 	unsigned	count;					//Number of elements in list of <reg,data> tuples
 	Pi2C* 		i2c;					//The I2C bus
 
 public:
-	Pi2CBlock(Pi2C* i2c, uint8_t);
+	Pi2CBlock(Pi2C*, uint8_t);
 	virtual ~Pi2CBlock();
 	void sendRegister(uint8_t,uint8_t);
 	void close();
