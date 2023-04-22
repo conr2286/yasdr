@@ -174,7 +174,7 @@ static void si5351aOutputOff(uint8_t clk) {
  *
  * @param busName	Specifies which I2C bus hosts the SI5351a
  * @param addr		Selects the SI5351a device on that bus
- * @param fXtal		SI5351a crystal frequency in Hz (nominally 27000000)
+ * @param fXtal		SI5351a crystal frequency in Hz (nominally 25000000)
  * @param cXtal		SI5351a load capacitance in pF (nominally 10 pF)
  * @return			0==success, -1==timeout
  *
