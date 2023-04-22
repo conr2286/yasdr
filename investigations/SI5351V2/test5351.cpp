@@ -16,12 +16,14 @@ int main(void)
 	}
 
 	//Start the Clk0 and Clk1 oscillators
-	si5351setFrequency(0, 5000000, 0);
-	si5351setFrequency(1, 5000000, 90);
+	si5351setFrequency(0, 1000000, 0);
+	//si5351setFrequency(1, 1000000, 90);
+	printf("Enabling clock(s)\n");
 
 	si5351ClockEnable(0,true);	//Enable Clk0
-	si5351ClockEnable(1,true);
+	//si5351ClockEnable(1,true);
 
+#ifdef TIMING
 	//Time minor changes in Clk2 frequency
 	int count=1000;
 	time_t t0 = time(NULL);
@@ -32,6 +34,7 @@ int main(void)
 	time_t t1 = time(NULL);
 	float t = ((float)(t1-t0))/count;
 	printf("t=%f seconds\n",t);
+#endif
 
 	return 0;
 }

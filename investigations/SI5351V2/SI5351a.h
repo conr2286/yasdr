@@ -24,7 +24,7 @@
 #define SI_CLK_SRC_PLL_A	0b00000000
 #define SI_CLK_SRC_PLL_B	0b00100000
 
-#define XTAL_FREQ	27000000			// Crystal frequency
+#define XTAL_FREQ	25000000			// Crystal frequency
 
 #define SI_I2C_ADDR	0x60				//SI5351a I2C Address
 #define NUM_CLOCKS 3					//SI5351a has 3 clock outputs

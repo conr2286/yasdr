@@ -65,6 +65,7 @@ uint8_t addr;			//This device
 
 // SI5351 internal register definitions
 #define SI_DEVICE_STATUS 0
+#define SI_INTR_MASK 2
 
 #define SI_CLK_ENABLE    3
 #define SI_CLK_ENABLE_0  0x01
@@ -74,6 +75,11 @@ uint8_t addr;			//This device
 #define SI_CLK0_CONTROL	16
 #define SI_CLK1_CONTROL	17
 #define SI_CLK2_CONTROL	18
+#define SI_CLK3_CONTROL 19
+#define SI_CLK4_CONTROL 20
+#define SI_CLK5_CONTROL 21
+#define SI_CLK6_CONTROL 22
+#define SI_CLK7_CONTROL 23
 #define SI_SYNTH_PLL_A	26
 #define SI_SYNTH_PLL_B	34
 #define SI_SYNTH_MS_0	42
@@ -127,13 +133,15 @@ static uint32_t xtalFreq;
  * Enable/Disable a clock
  *
  * @param addr					I2C address of SI5351a
- * @param clk					The clock bit(s)
+ * @param clkBit				Mask of clock bit(s) to enable/disable
  * @param bEnable				true==enable, false==disable
  * @throw errno					I2C communication failure
  *
  */
-static void si5351aOutputEnable(uint8_t addr, uint8_t clk, bool bEnable) {
+static void si5351aOutputEnable(uint8_t addr, uint8_t clkBit, bool bEnable) {
 	uint8_t reg;
+
+	printf("si5351aOutputEnable(%u,%u,%u)\n", addr, clkBit, bEnable);
 
 	// Read the existing register
 	try {
@@ -143,10 +151,10 @@ static void si5351aOutputEnable(uint8_t addr, uint8_t clk, bool bEnable) {
 	}
 	if (bEnable) {
 		// Enable by clearing the clk bit(s)
-		reg &= ~clk;
+		reg &= ~clkBit;
 	} else {
 		// Disable by setting the clk bit(s)
-		reg |= clk;
+		reg |= clkBit;
 	}
 	i2c->sendRegister(addr, SI_CLK_ENABLE, reg);
 }
@@ -156,6 +164,7 @@ static void si5351aOutputEnable(uint8_t addr, uint8_t clk, bool bEnable) {
 // Example: si5351aOutputOff(SI_CLK0_CONTROL);  //Will switch off output CLK0
 //
 static void si5351aOutputOff(uint8_t clk) {
+	printf("si5351aOutputOff(%u)\n", clk);
 	i2c->sendRegister(addr, clk, 0x80); // Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
 
 } //si5351aOutputOff
@@ -172,9 +181,11 @@ static void si5351aOutputOff(uint8_t clk) {
  * Usage:  si5351Init("/dev/i2c-1",0x60,27000000,10)	//Select device 0x60 on I2C bus 1 with 27 mHz xtal
  */
 
-int si5351Init(const char *busName, uint8_t address, uint32_t fXtal, uint32_t cXtal) {
+int si5351Init(const char *busName, uint8_t address, uint32_t fXtal,
+		uint32_t cXtal) {
 	uint8_t regVal;
-	int i;
+
+	printf("si5351Init(%s,%u,%u,%u)\n", busName, address, fXtal, cXtal);
 
 	//Build an interface to the I2C bus hosting the SI5351
 	i2c = new Pi2C(busName);	//Remember this I2C bus
@@ -183,33 +194,42 @@ int si5351Init(const char *busName, uint8_t address, uint32_t fXtal, uint32_t cX
 	//Remember the SI5351a crystal frequency (as it likely isn't *exactly* 27mHz)
 	xtalFreq = fXtal;		//Hz
 
-	// Wait for the device to be ready
+	// Wait for the SI5351 to be ready (it copies its NVRAM to RAM at power-up)
 	do {
 
 		// Poll the device status register until the system init bit clears
 		regVal = i2c->readRegister(addr, SI_DEVICE_STATUS);
-		printf("DEBUG SI_DEVICE_STATUS=0x%x\n",regVal);
+		printf("DEBUG si5351Init SI_DEVICE_STATUS=0x%x\n", regVal);
 
-	} while ((i++<MAX_INIT_TRIES)&&((regVal&SYS_INIT) != 0));
+	} while ((regVal & SYS_INIT) != 0);
 
-	// See if we have timed out
-	if (i >= MAX_INIT_TRIES) {
-		i2c -> ~Pi2C();
-		return -1;
-	} else {
-		// Chip is present and initialized.  Start by turning everything off as described
-		// in figure 12 of the data sheet.  They will be enabled when the frequency is set.
-		// Disable all the outputs
-		si5351aOutputEnable(addr, SI_CLK_ENABLE_0 | SI_CLK_ENABLE_1 | SI_CLK_ENABLE_2, false);
+	//Chip is present and initialized.  Step 1:  Disable all 8 outputs with CLKx_DIS
+	i2c->sendRegister(addr,SI_CLK_ENABLE,0xff);
+	//si5351aOutputEnable(addr, SI_CLK_ENABLE_0 | SI_CLK_ENABLE_1 | SI_CLK_ENABLE_2, false);
 
-		// Power down all the output drivers
-		si5351aOutputOff(SI_CLK0_CONTROL);
-		si5351aOutputOff(SI_CLK1_CONTROL);
-		si5351aOutputOff(SI_CLK2_CONTROL);
+	// Power down all eight output drivers per SI5351A/B/C doc
+	si5351aOutputOff(SI_CLK0_CONTROL);
+	si5351aOutputOff(SI_CLK1_CONTROL);
+	si5351aOutputOff(SI_CLK2_CONTROL);
+	si5351aOutputOff(SI_CLK3_CONTROL);
+	si5351aOutputOff(SI_CLK4_CONTROL);
+	si5351aOutputOff(SI_CLK5_CONTROL);
+	si5351aOutputOff(SI_CLK6_CONTROL);
+	si5351aOutputOff(SI_CLK7_CONTROL);
 
-		// Set the crystal load capacitance
-		i2c->sendRegister(addr, SI_XTAL_LOAD, cXtal);
+	// Mask interrupts (not available on SI5351A)
+	i2c->sendRegister(addr,SI_INTR_MASK,0xf0);
+
+	// Set the crystal load capacitance
+	uint8_t cBits;			//Crystal load bit encoding
+	switch(cXtal) {
+	case  6:  cBits=0x01; break;
+	case  8:  cBits=0x02; break;
+	case 10:  cBits=0x03; break;
+	case  0:
+	default:  cBits=0x11; break;
 	}
+	i2c->sendRegister(addr, SI_XTAL_LOAD, (cBits)<<6);
 
 	return 0;
 
@@ -225,6 +245,8 @@ int si5351Init(const char *busName, uint8_t address, uint32_t fXtal, uint32_t cX
 static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
 // a, b and c as defined in AN619
 	uint32_t a, b, c;
+
+	printf("setupPLL(%u,%u,%u)\n", pll, divider, frequency);
 
 //PLL configuration register values
 	uint32_t P1;
@@ -278,25 +300,18 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
 		newPll[pll][7] = (P2 & 0x000000FF);
 
 		// Write only those registers that have changed and then register 7
-		Pi2CBlock block(i2c, addr);			//An optimized block of regs sent to addr
+		Pi2CBlock block(i2c, addr);	//An optimized block of regs sent to addr
 		for (int i = 0; i < NUM_PLL_BYTES; i++) {
 			// It appears that writing register 7 latches in the new values.
 			if (i == 7 || (newPll[pll][i] != prevPll[pll][i])) {
-				//printf("Writing SI5351a reg %u\n",synthPLL[pll]+i);
-				//i2c->sendRegister(addr, synthPLL[pll] + i, newPll[pll][i]);
-				block.sendRegister(synthPLL[pll]+i, newPll[pll][i]); //Add to reg block
+				block.sendRegister(synthPLL[pll] + i, newPll[pll][i]); //Add to reg block
+				//i2c->sendRegister(addr,synthPLL[pll]+i, newPll[pll][i]);
 				prevPll[pll][i] = newPll[pll][i];
 			}
 		} //for
 		block.close();				//Flush any unsent data to regs in addr
-		//printf("\n");
 	} //if
 } //setupPLL
-
-
-
-
-
 
 /**
  * Set up MultiSynth with divider a+b/c and R divider
@@ -316,6 +331,8 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
 	uint32_t P3;					// Synth config register P3
 	uint8_t Div4 = 0;              // Divide by 4 bits
 
+	printf("setupMultisynth(%u,%u,%u,%u,%u)\n", synth, a, b, c, rDiv);
+
 // Calculate the values as defined in AN619
 	uint32_t p = 128 * b / c;
 	P1 = 128 * a + p - 512;
@@ -327,35 +344,32 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
 		Div4 = 0x0c;
 	}
 
-#define BURST_MODE	1				//Burst mode investigation
-#if	BURST_MODE
-	uint8_t	msVals[8] = {(P3 & 0x0000FF00) >> 8,
-						 (P3 & 0x000000FF),
-						 ((P1 & 0x00030000) >> 16) | rDiv | Div4,
-						 (P1 & 0x0000FF00) >> 8,
-						 (P1 & 0x000000FF),
-						 ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16),
-						 (P2 & 0x0000FF00) >> 8,
-						 (P2 & 0x000000FF)
-						};
-	i2c->sendRegister(addr, synth + 0, 8, msVals);
+#define BURST_MODEI	1				//Burst mode investigation
+#if	BURST_MODEI
+	uint8_t msVals[8] = { (P3 & 0x0000FF00) >> 8,
+			(P3 & 0x000000FF),
+			((P1 & 0x00030000) >> 16) | rDiv | Div4,
+			(P1 & 0x0000FF00) >> 8,
+			(P1	& 0x000000FF),
+			((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16),
+			(P2 & 0x0000FF00) >> 8,
+			(P2 & 0x000000FF) };
+	//for (int di = 0; di <= 7; di++) printf("msVals[%i]=%u\n", di, msVals[di]);
+	i2c->sendRegister(addr, synth+0, 7, msVals);
+	i2c->sendRegister(addr, synth+7,(P2 & 0x000000FF));
 #else
 	i2c->sendRegister(addr, synth + 0, (P3 & 0x0000FF00) >> 8);
 	i2c->sendRegister(addr, synth + 1, (P3 & 0x000000FF));
 	i2c->sendRegister(addr, synth + 2, ((P1 & 0x00030000) >> 16) | rDiv | Div4);
 	i2c->sendRegister(addr, synth + 3, (P1 & 0x0000FF00) >> 8);
 	i2c->sendRegister(addr, synth + 4, (P1 & 0x000000FF));
-	i2c->sendRegister(addr, synth + 5,
-			((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
+	i2c->sendRegister(addr, synth + 5, ((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16));
 	i2c->sendRegister(addr, synth + 6, (P2 & 0x0000FF00) >> 8);
 	i2c->sendRegister(addr, synth + 7, (P2 & 0x000000FF));
 #endif
 
+	//i2c->delay(1);
 } //setupMultisynth
-
-
-
-
 
 /**
  * Enable/disable a clock output
@@ -364,14 +378,11 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
  * @param bEnable			true=enable, false=disable
  */
 void si5351ClockEnable(uint8_t clock, bool bEnable) {
+	printf("si5351ClockEnable(%u,%u)\n", clock, bEnable);
 	if (clock < NUM_CLOCKS) {
 		si5351aOutputEnable(addr, SI_CLK_ENABLE_0 << clock, bEnable);
 	}
 } //si5351ClockEnable()
-
-
-
-
 
 // Get the multisynth divider for the frequency
 // These have been chosen for the maximum range to avoid
@@ -542,7 +553,7 @@ void si5351setFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 // Whether quadrature has been enabled
 	static int8_t quadrature;
 
-	//printf("si5351setFrequency(%u,%u,%u)\n",clock,frequency,q);
+	printf("\nsi5351setFrequency(%u,%u,%u)\n", clock, frequency, q);
 
 // To get the output frequency the PLL is divided by a+b/c
 	uint32_t a, b, c;
@@ -692,6 +703,7 @@ void si5351setFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 
 // Set the crystal frequency.
 void oscSetXtalFrequency(uint32_t xtal_freq) {
+	printf("oscSetXtalFrequency(%u)\n", xtal_freq);
 	xtalFreq = xtal_freq;
 } //oscSetXtalFrequency
 

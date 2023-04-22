@@ -73,6 +73,7 @@
 #include <stdexcept>
 #include <linux/types.h>
 #include <linux/i2c-dev.h>
+#include <i2c/smbus.h>
 
 #include "Pi2C.h"
 
@@ -103,6 +104,8 @@ Pi2C::Pi2C(const char *busName) {
 		throw errno;			//Whoopsie!
 	}
 
+	printf("Pi2C.fd=%d\n",fd);
+
 } //I2C()
 
 //Destructor merely closes the file descriptor resource
@@ -123,9 +126,11 @@ Pi2C::~Pi2C() {
  */
 void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint8_t c) {
 
+	printf("Pi2C::sendRegister(0x%x,%u,%u)\n",dev,reg,c);
+
 	uint8_t bfr[2];					//Bytes to send to dev
 
-	struct i2c_msg params[1];//I2C_RDWR parameters for a write to register operation
+	struct i2c_msg msg[1];//I2C_RDWR parameters for a write to register operation
 	struct i2c_rdwr_ioctl_data req[1];	//I2C_RDWR request packet
 
 	//Build buffer of data to transmit to the device
@@ -133,13 +138,13 @@ void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint8_t c) {
 	bfr[1] = c;						//Byte to send to that register
 
 	//Build ioctl's I2C_RDWR parameters to do a single write operation with 7-bit addressing
-	params[0].addr = dev;			//Specify which slave device to access
-	params[0].flags = 0;			//Write using 7-bit addressing
-	params[0].len = 2;				//Send 2 bytes (register number and data) to dev
-	params[0].buf = bfr;			//Pointer to the data buffer containing those bytes
+	msg[0].addr = dev;			//Specify which slave device to access
+	msg[0].flags = 0;			//Write using 7-bit addressing
+	msg[0].len = 2;				//Send 2 bytes (register number and data) to dev
+	msg[0].buf = bfr;			//Pointer to the data buffer containing those bytes
 
 	//Build the ioctl I2C_RDWR request to send <reg,c> to dev on I2C bus accessed thru fd
-	req[0].msgs = params;
+	req[0].msgs = msg;
 	req[0].nmsgs = 1;
 	if (ioctl(fd, I2C_RDWR, &req) < 0) {
 		throw errno;
@@ -166,32 +171,32 @@ void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint8_t c) {
  */
 void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint32_t count, uint8_t* c) {
 
-	uint8_t bfr[2];					//Bytes to send to dev
+	printf("Pi2C::sendRegister(0x%x,%u,%u,{",dev,reg,count);
+	uint8_t* pc=c;
+	for(unsigned di=0;di<count;di++) printf(" %u",*pc++);
+	printf(" })\n");
 
-	struct i2c_msg params[2];			//I2C_RDWR parameters for a write to register operation
-	struct i2c_rdwr_ioctl_data req[1];	//I2C_RDWR request packet
+	uint8_t* bfr = (uint8_t *)malloc(count+1);	//Buffer to combine reg and data
 
-	//Build first buffer of data to transmit to the device
+	struct i2c_msg msgs;			//I2C_RDWR parameters for a write to register operation
+	struct i2c_rdwr_ioctl_data req;	//I2C_RDWR request packet
+
+	//Build bfr containing the destination register followed by count bytes of data
 	bfr[0] = reg;					//Selects the destination register within the device
-
-	//Build ioctl's I2C_RDWR parameters to do a write operation with 7-bit addressing
-	params[0].addr = dev;			//Specify which slave device to access
-	params[0].flags = 0;			//Write using 7-bit addressing
-	params[0].len = 1;				//Send 2 bytes (register number and data) to dev
-	params[0].buf = bfr;			//Pointer to the data buffer containing those bytes
-
-	//Build ioctl I2C_RDWR parameters to write user's data to the device
-	params[1].addr = dev;				//Specify slave device address
-	params[1].flags = I2C_M_NOSTART;	//Continue writing more data
-	params[1].len = count;				//Number of bytes to send
-	params[1].buf = c;					//Place the read data in user's buffer
+	for(unsigned i=1; i<=count; i++) bfr[i] = *c++; //The actual data
+	msgs.addr = dev;
+	msgs.flags = 0;
+	msgs.len = count+1;
+	msgs.buf = bfr;
 
 	//Build the ioctl I2C_RDWR request to send <reg,c> to dev on I2C bus accessed thru fd
-	req[0].msgs = params;
-	req[0].nmsgs = 2;				//Send two chunks to device
+	req.msgs = &msgs;			//ioctl parameter packet
+	req.nmsgs = 1;				//Send one chunk to device
 	if (ioctl(fd, I2C_RDWR, &req) < 0) {
+		free(bfr);
 		throw errno;
 	}
+	free(bfr);
 
 } //sendRegister()
 
@@ -251,6 +256,7 @@ void Pi2C::readRegister(uint8_t dev, uint8_t reg, uint8_t *pBfr) {
 uint8_t Pi2C::readRegister(uint8_t dev, uint8_t reg) {
 	uint8_t c;
 	readRegister(dev, reg, &c);
+	printf("Pi2C::readRegister(%u,%u) returns 0x%x\n",dev, reg, c);
 	return(c);
 } //readRegister()
 

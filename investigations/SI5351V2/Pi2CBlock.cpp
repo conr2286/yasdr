@@ -14,6 +14,7 @@
 /**
  * Construct an optimized register block for I2C device at addr
  *
+ * @param i2C		Pi2C bus
  * @param addr		7-bit I2C address of device
  *
  * This class constructs an object working with Pi2C to optimally send a
@@ -59,18 +60,19 @@ Pi2CBlock::Pi2CBlock(Pi2C* i2C, uint8_t addr) {
  */
 void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
 
-	printf("Pi2CBlock::sendRegister(%u,%u\n)",reg,data);
+	printf("Pi2CBlock::sendRegister(%u,%u)\n",reg,data);
 
 	//Build new <reg,data> tuple
 	Pi2CRegData *newTuple = new (Pi2CRegData);
 	newTuple->next = NULL;
-	newTuple->reg = reg;
-	newTuple->data = data;
+	newTuple->reg = reg;		//close() will write this register...
+	newTuple->data = data;		//with this data value.
 
 	//Insert at head of list?
 	if (count == 0) {
 		first = newTuple;
 		count = 1;
+		printf("Inserted %u at head of list\n",reg);
 		return;
 	}
 
@@ -89,8 +91,8 @@ void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
 	}
 
 	//Exited loop with curTuple referencing the tuple to proceed newTuple.
-	if (curTuple->next==NULL) printf("Inserted at end of existing list\n");
-	else printf("Inserted into midst of existing list\n");
+	if (curTuple->next==NULL) printf("Inserted %u at end of existing list\n",reg);
+	else printf("Inserted %u into midst of existing list\n",reg);
 	newTuple->next = curTuple->next;
 	curTuple->next = newTuple;
 	count++;
@@ -112,6 +114,8 @@ void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
  */
 void Pi2CBlock::close() {
 
+	printf("Pi2CBlock::close()\n");
+
 	//Perhaps there isn't anything to send
 	if (count==0) return;
 
@@ -120,7 +124,7 @@ void Pi2CBlock::close() {
 
 	//Outer loop walks the list, assembling one block of sequential data into the buffer
 	Pi2CRegData* curTuple = first;		//Begin examining list at first tuple
-	printf("Closing an existing reg block list\n");
+	printf("Closing reg block list\n");
 	while(curTuple!=NULL) {
 
 		//Start filling the buffer
@@ -136,14 +140,13 @@ void Pi2CBlock::close() {
 		} while(curTuple->reg==nextReg++);		//No, does this following tuple belong in bufr?
 
 		//Loop exited when bfr has n bytes of sequential data starting at firstReg
-		printf("sendRegister(%u,%u,%u,bfr)\n",i2cDevice,firstReg,n);
 		i2c->sendRegister(i2cDevice,firstReg,n,bfr);	//Burst write bfr to firstReg in device addr
-		printf("Sent %u bytes at reg %u\n",n,firstReg);
 
 	} //Outer loop
 
 	//Free the buffer after processing the entire tuple list
 	free(bfr);
+	printf("Closed bfr---------------------------------------\n");
 
 } //close()
 
