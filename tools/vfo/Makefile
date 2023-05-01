@@ -1,6 +1,15 @@
 CFLAGS= -std=c17 
+CXXFLAGS=-O -std=c++17 -Wall
+
 PGM = vfo
 OBJS= vfo.o DebugKit.o SI5351a.o Pi2CBlock.o Pi2C.o
+
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+	
+.c.o:
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 #-----Build the *.d files before the product
 all:  rules.d vfo
@@ -17,8 +26,8 @@ rules.d: Makefile $(wildcard *.c) $(wildcard *.h)
 -include rules.d
 
 #-----Rebuild the vfo program
-vfo: $(OBJS) vfo.o Makefile
-	gcc $(OBJS) -o $@
+vfo: $(OBJS) Makefile
+	g++ $(CXXFLAGS) $(OBJS) -o $@
 
 clean:
 	rm -f *.o $(PGM)  *~ *.d

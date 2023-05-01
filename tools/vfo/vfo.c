@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
 	int c;
 
-	unsigned long freqHz = 10000000;	//VFO frequency in HZ
+	uint32_t freqHz = 10000000;	//VFO frequency in HZ
 
 	DK_SET_VAR(dbg);
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	//Start the Clk0 oscillator at requested frequency
-	si5351setFrequency(0, freqHz, 0);
+	si5351SetFrequency(0, freqHz, 0);
 
 	return 0;
 }

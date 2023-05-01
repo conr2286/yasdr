@@ -16,7 +16,7 @@ int main(void)
 	}
 
 	//Start the Clk0 and Clk1 oscillators
-	si5351setFrequency(0, 10000000, 0);
+	si5351SetFrequency(0, 10000000, 0);
 	//si5351setFrequency(1, 1000000, 90);
 	printf("Enabling clock(s)\n");
 
@@ -28,8 +28,8 @@ int main(void)
 	int count=1000;
 	time_t t0 = time(NULL);
 	for (int i=0; i<count; i++) {
-		si5351setFrequency(2, 1000000, 0);
-		si5351setFrequency(2, 1000050, 0);
+		si5351SetFrequency(2, 1000000, 0);
+		si5351SetFrequency(2, 1000050, 0);
 	}
 	time_t t1 = time(NULL);
 	float t = ((float)(t1-t0))/count;

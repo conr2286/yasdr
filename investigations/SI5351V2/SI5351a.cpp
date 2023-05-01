@@ -549,7 +549,7 @@ static uint8_t getRDiv(uint32_t *pFreq) {
 // -ve is CLK1 lags  CLK0 by 90 degrees
 // 0 is no quadrature i.e. set the frequency as normal
 // When quadrature is set for clock 1 then it is set to the same frequency as clock 0
-void si5351setFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
+void si5351SetFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 // Whether quadrature has been enabled
 	static int8_t quadrature;
 
