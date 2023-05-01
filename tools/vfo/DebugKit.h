@@ -41,10 +41,10 @@
 extern struct DK_TRACE_FLAGS dkTraceBits;		//The field's implementation resides in DebugKit.c
 
 //Assign a value to a trace flag bit
-#define DK_SET_VAR(bit,val) dkTraceBits.bit = val;
+#define DK_SET_VAR(bit,val) {dkTraceBits.bit = val;}
 
 //Formatted trace print
-#define DK_TRACE(bit, ...) if (dkTraceBits.bit) printf(__VA_ARGS__);
+#define DK_TRACE(bit, ...) {if (dkTraceBits.bit) printf(__VA_ARGS__);}
 
 #else //~DEBUG
 

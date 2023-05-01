@@ -54,6 +54,7 @@
 //#include "config.h"
 //#include "osc.h"
 //#include "millis.h"
+#include "DebugKit.h"
 #include "SI5351a.h"
 #include "Pi2CBlock.h"
 
@@ -141,7 +142,7 @@ static uint32_t xtalFreq;
 static void si5351aOutputEnable(uint8_t addr, uint8_t clkBit, bool bEnable) {
 	uint8_t reg;
 
-	printf("si5351aOutputEnable(%u,%u,%u)\n", addr, clkBit, bEnable);
+	DK_TRACE(si5351,"si5351aOutputEnable(%u,%u,%u)\n", addr, clkBit, bEnable);
 
 	// Read the existing register
 	try {
@@ -164,7 +165,7 @@ static void si5351aOutputEnable(uint8_t addr, uint8_t clkBit, bool bEnable) {
 // Example: si5351aOutputOff(SI_CLK0_CONTROL);  //Will switch off output CLK0
 //
 static void si5351aOutputOff(uint8_t clk) {
-	printf("si5351aOutputOff(%u)\n", clk);
+	DK_TRACE(si5351,"si5351aOutputOff(%u)\n", clk);
 	i2c->sendRegister(addr, clk, 0x80); // Refer to SiLabs AN619 to see bit values - 0x80 turns off the output stage
 
 } //si5351aOutputOff
@@ -185,7 +186,7 @@ int si5351Init(const char *busName, uint8_t address, uint32_t fXtal,
 		uint32_t cXtal) {
 	uint8_t regVal;
 
-	printf("si5351Init(%s,%u,%u,%u)\n", busName, address, fXtal, cXtal);
+	DK_TRACE(si5351,"si5351Init(%s,%u,%u,%u)\n", busName, address, fXtal, cXtal);
 
 	//Build an interface to the I2C bus hosting the SI5351
 	i2c = new Pi2C(busName);	//Remember this I2C bus
@@ -199,7 +200,7 @@ int si5351Init(const char *busName, uint8_t address, uint32_t fXtal,
 
 		// Poll the device status register until the system init bit clears
 		regVal = i2c->readRegister(addr, SI_DEVICE_STATUS);
-		printf("DEBUG si5351Init SI_DEVICE_STATUS=0x%x\n", regVal);
+		DK_TRACE(si5351,"DEBUG si5351Init SI_DEVICE_STATUS=0x%x\n", regVal);
 
 	} while ((regVal & SYS_INIT) != 0);
 
@@ -246,7 +247,7 @@ static void setupPLL(uint8_t pll, uint32_t divider, uint32_t frequency) {
 // a, b and c as defined in AN619
 	uint32_t a, b, c;
 
-	printf("setupPLL(%u,%u,%u)\n", pll, divider, frequency);
+	DK_TRACE(si5351,"setupPLL(%u,%u,%u)\n", pll, divider, frequency);
 
 //PLL configuration register values
 	uint32_t P1;
@@ -331,7 +332,7 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
 	uint32_t P3;					// Synth config register P3
 	uint8_t Div4 = 0;              // Divide by 4 bits
 
-	printf("setupMultisynth(%u,%u,%u,%u,%u)\n", synth, a, b, c, rDiv);
+	DK_TRACE(si5351,"setupMultisynth(%u,%u,%u,%u,%u)\n", synth, a, b, c, rDiv);
 
 // Calculate the values as defined in AN619
 	uint32_t p = 128 * b / c;
@@ -354,7 +355,7 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
 			((P3 & 0x000F0000) >> 12) | ((P2 & 0x000F0000) >> 16),
 			(P2 & 0x0000FF00) >> 8,
 			(P2 & 0x000000FF) };
-	//for (int di = 0; di <= 7; di++) printf("msVals[%i]=%u\n", di, msVals[di]);
+	//for (int di = 0; di <= 7; di++) DK_TRACE(si5351,"msVals[%i]=%u\n", di, msVals[di]);
 	i2c->sendRegister(addr, synth+0, 7, msVals);
 	i2c->sendRegister(addr, synth+7,(P2 & 0x000000FF));
 #else
@@ -378,7 +379,7 @@ static void setupMultisynth(uint8_t synth, uint32_t a, uint32_t b, uint32_t c,
  * @param bEnable			true=enable, false=disable
  */
 void si5351ClockEnable(uint8_t clock, bool bEnable) {
-	printf("si5351ClockEnable(%u,%u)\n", clock, bEnable);
+	DK_TRACE(si5351,"si5351ClockEnable(%u,%u)\n", clock, bEnable);
 	if (clock < NUM_CLOCKS) {
 		si5351aOutputEnable(addr, SI_CLK_ENABLE_0 << clock, bEnable);
 	}
@@ -553,7 +554,7 @@ void si5351SetFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 // Whether quadrature has been enabled
 	static int8_t quadrature;
 
-	printf("\nsi5351setFrequency(%u,%u,%u)\n", clock, frequency, q);
+	DK_TRACE(si5351,"\nsi5351setFrequency(%u,%u,%u)\n", clock, frequency, q);
 
 // To get the output frequency the PLL is divided by a+b/c
 	uint32_t a, b, c;
@@ -703,7 +704,7 @@ void si5351SetFrequency(uint8_t clock, uint32_t frequency, int8_t q) {
 
 // Set the crystal frequency.
 void oscSetXtalFrequency(uint32_t xtal_freq) {
-	printf("oscSetXtalFrequency(%u)\n", xtal_freq);
+	DK_TRACE(si5351,"oscSetXtalFrequency(%u)\n", xtal_freq);
 	xtalFreq = xtal_freq;
 } //oscSetXtalFrequency
 

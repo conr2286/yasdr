@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "DebugKit.h"
 #include "Pi2CBlock.h"
 
 /**
@@ -28,15 +30,12 @@
  * transactions.
  *
  */
-Pi2CBlock::Pi2CBlock(Pi2C* i2C, uint8_t addr) {
+Pi2CBlock::Pi2CBlock(Pi2C *i2C, uint8_t addr) {
 	i2cDevice = addr;					//Remember the target device address
 	count = 0;							//Reset count of <register,data> tuples
 	first = NULL;						//Ordered list of <register,data> tuples
 	i2c = i2C;
 }
-
-
-
 
 /**
  *  Buffer <reg,data> to later send to i2cDevice
@@ -60,7 +59,7 @@ Pi2CBlock::Pi2CBlock(Pi2C* i2C, uint8_t addr) {
  */
 void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
 
-	printf("Pi2CBlock::sendRegister(%u,%u)\n",reg,data);
+	DK_TRACE(i2cb,"Pi2CBlock::sendRegister(%u,%u)\n",reg,data);
 
 	//Build new <reg,data> tuple
 	Pi2CRegData *newTuple = new (Pi2CRegData);
@@ -72,7 +71,7 @@ void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
 	if (count == 0) {
 		first = newTuple;
 		count = 1;
-		printf("Inserted %u at head of list\n",reg);
+		DK_TRACE(i2cb,"Inserted %u at head of list\n",reg);
 		return;
 	}
 
@@ -91,16 +90,16 @@ void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
 	}
 
 	//Exited loop with curTuple referencing the tuple to proceed newTuple.
-	if (curTuple->next==NULL) printf("Inserted %u at end of existing list\n",reg);
-	else printf("Inserted %u into midst of existing list\n",reg);
+	if (curTuple->next == NULL) {
+		DK_TRACE(i2cb,"Inserted %u at end of existing list\n",reg);
+	} else {
+		DK_TRACE(i2cb,"Inserted %u into midst of existing list\n",reg);
+	}
 	newTuple->next = curTuple->next;
 	curTuple->next = newTuple;
 	count++;
 
 } //sendRegister()
-
-
-
 
 /**
  *  Close a block of <reg,data> tuples
@@ -114,53 +113,50 @@ void Pi2CBlock::sendRegister(uint8_t reg, uint8_t data) {
  */
 void Pi2CBlock::close() {
 
-	printf("Pi2CBlock::close()\n");
+	DK_TRACE(i2cb,"Pi2CBlock::close()\n");
 
 	//Perhaps there isn't anything to send
-	if (count==0) return;
+	if (count == 0)
+		return;
 
 	//Construct a buffer large enough to hold all of the data from the tuple list
-	uint8_t* bfr = (uint8_t *)malloc(count);		//It's an array of bytes
+	uint8_t *bfr = (uint8_t*) malloc(count);		//It's an array of bytes
 
 	//Outer loop walks the list, assembling one block of sequential data into the buffer
-	Pi2CRegData* curTuple = first;		//Begin examining list at first tuple
-	printf("Closing reg block list\n");
-	while(curTuple!=NULL) {
+	Pi2CRegData *curTuple = first;		//Begin examining list at first tuple
+	DK_TRACE(i2cb,"Closing reg block list\n");
+	while (curTuple != NULL) {
 
 		//Start filling the buffer
-		printf("Start filling bfr[] at reg %u\n",curTuple->reg);
-		uint8_t firstReg = curTuple->reg;		//Register number of first tuple in bfr
-		uint8_t nextReg  = firstReg+1;			//Number of next expected register following curTuple
+		DK_TRACE(i2cb,"Start filling bfr[] at reg %u\n",curTuple->reg);
+		uint8_t firstReg = curTuple->reg;//Register number of first tuple in bfr
+		uint8_t nextReg = firstReg + 1;	//Number of next expected register following curTuple
 		unsigned n = 0;							//Buffer is currently empty
 		do {
-			printf("Filling bfr[%u] for reg %u with %u\n",n,curTuple->reg,curTuple->data);
-			bfr[n++] = curTuple->data;			//Buffer a byte of data from this tuple
-			curTuple = curTuple->next;			//Now consider the following tuple if any
-			if (curTuple == NULL) break;		//End of list?
-		} while(curTuple->reg==nextReg++);		//No, does this following tuple belong in bufr?
+			DK_TRACE(i2cb,"Filling bfr[%u] for reg %u with %u\n",n,curTuple->reg,curTuple->data);
+			bfr[n++] = curTuple->data;	//Buffer a byte of data from this tuple
+			curTuple = curTuple->next;//Now consider the following tuple if any
+			if (curTuple == NULL)
+				break;		//End of list?
+		} while (curTuple->reg == nextReg++);//No, does this following tuple belong in bufr?
 
 		//Loop exited when bfr has n bytes of sequential data starting at firstReg
-		i2c->sendRegister(i2cDevice,firstReg,n,bfr);	//Burst write bfr to firstReg in device addr
+		i2c->sendRegister(i2cDevice, firstReg, n, bfr);	//Burst write bfr to firstReg in device addr
 
 	} //Outer loop
 
 	//Free the buffer after processing the entire tuple list
 	free(bfr);
-	printf("Closed bfr---------------------------------------\n");
+	DK_TRACE(i2cb,"Closed bfr---------------------------------------\n");
 
 } //close()
-
-
-
-
-
 
 Pi2CBlock::~Pi2CBlock() {
 
 	//Free the list of tuples
 	Pi2CRegData *p = first;
-	while (p!=NULL) {
-		Pi2CRegData* next = p->next;
+	while (p != NULL) {
+		Pi2CRegData *next = p->next;
 		free(p);
 		p = next;
 	}

@@ -75,6 +75,7 @@
 #include <linux/i2c-dev.h>
 #include <i2c/smbus.h>
 
+#include "DebugKit.h"
 #include "Pi2C.h"
 
 /**
@@ -96,7 +97,7 @@
  */
 Pi2C::Pi2C(const char *busName) {
 
-	printf("Pi2C(%s)\n",busName);
+	DK_TRACE(i2c,"Pi2C(%s)\n",busName);
 
 	//Open the I2C bus
 	fd = open(busName, O_RDWR); //Open the i2c file descriptor in read/write mode
@@ -104,7 +105,7 @@ Pi2C::Pi2C(const char *busName) {
 		throw errno;			//Whoopsie!
 	}
 
-	printf("Pi2C.fd=%d\n",fd);
+	DK_TRACE(i2c,"Pi2C.fd=%d\n",fd);
 
 } //I2C()
 
@@ -126,7 +127,7 @@ Pi2C::~Pi2C() {
  */
 void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint8_t c) {
 
-	printf("Pi2C::sendRegister(0x%x,%u,%u)\n",dev,reg,c);
+	DK_TRACE(i2c,"Pi2C::sendRegister(0x%x,%u,%u)\n",dev,reg,c);
 
 	uint8_t bfr[2];					//Bytes to send to dev
 
@@ -171,10 +172,10 @@ void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint8_t c) {
  */
 void Pi2C::sendRegister(uint8_t dev, uint8_t reg, uint32_t count, uint8_t* c) {
 
-	printf("Pi2C::sendRegister(0x%x,%u,%u,{",dev,reg,count);
+	DK_TRACE(i2c,"Pi2C::sendRegister(0x%x,%u,%u,{",dev,reg,count);
 	uint8_t* pc=c;
-	for(unsigned di=0;di<count;di++) printf(" %u",*pc++);
-	printf(" })\n");
+	for(unsigned di=0;di<count;di++) DK_TRACE(i2c," %u",*pc++);
+	DK_TRACE(i2c," })\n");
 
 	uint8_t* bfr = (uint8_t *)malloc(count+1);	//Buffer to combine reg and data
 
@@ -256,7 +257,7 @@ void Pi2C::readRegister(uint8_t dev, uint8_t reg, uint8_t *pBfr) {
 uint8_t Pi2C::readRegister(uint8_t dev, uint8_t reg) {
 	uint8_t c;
 	readRegister(dev, reg, &c);
-	printf("Pi2C::readRegister(%u,%u) returns 0x%x\n",dev, reg, c);
+	DK_TRACE(i2c,"Pi2C::readRegister(%u,%u) returns 0x%x\n",dev, reg, c);
 	return(c);
 } //readRegister()
 

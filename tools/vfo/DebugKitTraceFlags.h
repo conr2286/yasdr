@@ -9,7 +9,10 @@
 #include <stdio.h>
 
 struct DK_TRACE_FLAGS {
-	unsigned dbg:1;
+	unsigned vfo:1;
+	unsigned si5351:1;
+	unsigned i2cb:1;
+	unsigned i2c:1;
 };
 
 //Define project-dependent macro to output trace messages to console

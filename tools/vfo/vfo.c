@@ -27,14 +27,15 @@ int main(int argc, char *argv[]) {
 
 	uint32_t freqHz = 10000000;	//VFO frequency in HZ
 
-	DK_SET_VAR(dbg);
+	DK_SET_VAR(vfo,0);
 
 	opterr = 0;
 
 	while ((c = getopt(argc, argv, "D")) != -1) {
 		switch (c) {
 		case 'D':
-			DK_SET_VAR(dbg,1);
+			DK_SET_VAR(vfo,1);
+			DK_SET_VAR(si5351,1);
 			break;
 		case '?':
 			fprintf(stderr, "Usage:  vfo [-D] <frequency>\n");
@@ -51,14 +52,14 @@ int main(int argc, char *argv[]) {
 	}
 
 	//Parse requested frequency
-	DK_TRACE(dbg,"arg[%d]=%s\n",optind,argv[optind]);
-	sscanf(argv[optind],"%lu",&freqHz);
+	DK_TRACE(vfo,"arg[%d]=%s\n",optind,argv[optind]);
+	sscanf(argv[optind],"%u",&freqHz);
 
 
 	//Initialize the SI5351a
 	int err = si5351Init("/dev/i2c-1", 0x60, 25000000, 10);
 	if (err < 0) {
-		printf("si5351Init failed\n");
+		fprintf(stderr,"si5351Init failed\n");
 		exit(-1);
 	}
 

@@ -16,6 +16,7 @@ all:  rules.d vfo
 
 #-----Builds a debug version of the test program (*must* follow make clean)
 debug: CFLAGS += -Og -g -DDEBUG
+debug: CXXFLAGS += -Og -g -DDEBUG
 debug: rules.d vfo
 
 #-----Rebuild the dependency (*.d) files from their sources
