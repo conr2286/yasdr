@@ -36,6 +36,8 @@ int main(int argc, char *argv[]) {
 		case 'D':
 			DK_SET_VAR(vfo,1);
 			DK_SET_VAR(si5351,1);
+			DK_SET_VAR(i2cb,1);
+			DK_SET_VAR(i2c,1);
 			break;
 		case '?':
 			fprintf(stderr, "Usage:  vfo [-D] <frequency>\n");
@@ -65,6 +67,7 @@ int main(int argc, char *argv[]) {
 
 	//Start the Clk0 oscillator at requested frequency
 	si5351SetFrequency(0, freqHz, 0);
+	si5351ClockEnable(0,true);			//Enable Clk0
 
 	return 0;
 }
