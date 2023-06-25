@@ -1,5 +1,0 @@
-With I2C at 100000 bits/sec and no burst mode:  9.0MS to setFrequency()
-With I2C at 100000 bits/sec and burst mode:     6.5MS to setFrequency()
-With I2C at 400000 bits/sec and burst mode:     2.5MS to setFrequency()
-
-Note:  Changing Clk2 from 1000000 to 1000050 hz modifies SI5351 regs 39, 40 and 41

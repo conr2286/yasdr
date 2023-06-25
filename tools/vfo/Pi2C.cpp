@@ -102,6 +102,7 @@ Pi2C::Pi2C(const char *busName) {
 	//Open the I2C bus
 	fd = open(busName, O_RDWR); //Open the i2c file descriptor in read/write mode
 	if (fd < 0) {
+		DK_TRACE(i2c,"open(%s) failed, errno=%d\n",busName,errno);
 		throw errno;			//Whoopsie!
 	}
 
