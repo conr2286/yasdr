@@ -23,6 +23,8 @@
 
 int main(int argc, char *argv[]) {
 
+	fprintf(stderr,"Starting...\n");
+
 	int c;
 
 	uint32_t freqHz = 10000000;	//VFO frequency in HZ
@@ -50,10 +52,12 @@ int main(int argc, char *argv[]) {
 		} //switch
 	} //while
 
+
 	//Initialize the SI5351a
+	DK_TRACE(vfo,"Initializing...\n");
 	int err = si5351Init("/dev/i2c-1", 0x60, 25000000, 10);
 	if (err < 0) {
-		fprintf(stderr,"si5351Init failed\n");
+		fprintf(stderr,"si5351Init() failed\n");
 		exit(-1);
 	}
 

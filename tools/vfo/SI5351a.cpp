@@ -177,7 +177,7 @@ static void si5351aOutputOff(uint8_t clk) {
  * @param addr		Selects the SI5351a device on that bus
  * @param fXtal		SI5351a crystal frequency in Hz (nominally 25000000)
  * @param cXtal		SI5351a load capacitance in pF (nominally 10 pF)
- * @return			0==success, -1==timeout
+ * @return		0==success, -1==error
  *
  * Usage:  si5351Init("/dev/i2c-1",0x60,27000000,10)	//Select device 0x60 on I2C bus 1 with 27 mHz xtal
  */
@@ -189,7 +189,12 @@ int si5351Init(const char *busName, uint8_t address, uint32_t fXtal,
 	DK_TRACE(si5351,"si5351Init(%s,%u,%u,%u)\n", busName, address, fXtal, cXtal);
 
 	//Build an interface to the I2C bus hosting the SI5351
-	i2c = new Pi2C(busName);	//Remember this I2C bus
+	try {
+		i2c = new Pi2C(busName);	//Remember this I2C bus
+	} catch(int e) {
+		DK_TRACE(si5351,"Cannot access I2C bus\n");
+		return -1;
+	}
 	addr = address;			//Remember I2C address of this SI5351 on that bus
 
 	//Remember the SI5351a crystal frequency (as it likely isn't *exactly* 27mHz)
