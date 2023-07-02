@@ -1,7 +1,0 @@
-EESchema-DOCLIB  Version 2.0
-#
-$CMP IRF510
-D IRF510
-F http://www.vishay.com/docs/91015/sihf510.pdf
-$ENDCMP
-# end doc library
