@@ -1,0 +1,1 @@
+cmd='<SOURCE_DIR>/configure;--prefix=<INSTALL_DIR>;--disable-shared;--enable-static;--without-cxx-binding;CFLAGS=-g -O2 -fPIC -fdata-sections -ffunction-sections;LDFLAGS=-Wl,--gc-sections'

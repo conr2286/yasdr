@@ -1,0 +1,8 @@
+# Target labels
+ hamlib
+# Source files and their labels
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/hamlib-update
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/hamlib-update.rule
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix/src/hamlib-stamp/hamlib-update.rule
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix/src/hamlib-stamp/hamlib-download.rule
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix/src/hamlib-stamp/hamlib-mkdir.rule

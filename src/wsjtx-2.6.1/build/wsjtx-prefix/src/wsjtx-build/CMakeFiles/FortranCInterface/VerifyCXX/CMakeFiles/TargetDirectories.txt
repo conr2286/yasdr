@@ -1,0 +1,4 @@
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/CMakeFiles/FortranCInterface/VerifyCXX/CMakeFiles/rebuild_cache.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/CMakeFiles/FortranCInterface/VerifyCXX/CMakeFiles/edit_cache.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/CMakeFiles/FortranCInterface/VerifyCXX/CMakeFiles/VerifyFortranC.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/CMakeFiles/FortranCInterface/VerifyCXX/CMakeFiles/VerifyFortran.dir

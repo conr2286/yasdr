@@ -1,0 +1,40 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-package"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-package.rule"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-package.rule"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-build.rule"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-configure.rule"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-patch.rule"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-update.rule"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-download.rule"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-mkdir.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"wsjtx"
+		],
+		"name" : "wsjtx-package"
+	}
+}

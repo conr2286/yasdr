@@ -1,0 +1,106 @@
+{
+	"BUILD_DIR" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/tests/test_qt_helpers_autogen",
+	"CMAKE_BINARY_DIR" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/tests",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/tests",
+	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/tests/CMakeLists.txt",
+		"/usr/lib/aarch64-linux-gnu/cmake/Qt5Test/Qt5TestConfigVersion.cmake",
+		"/usr/lib/aarch64-linux-gnu/cmake/Qt5Test/Qt5TestConfig.cmake",
+		"/usr/lib/aarch64-linux-gnu/cmake/Qt5Test/Qt5TestConfigExtras.cmake"
+	],
+	"CMAKE_SOURCE_DIR" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx",
+	"DEP_FILE" : "",
+	"DEP_FILE_RULE_NAME" : "",
+	"HEADERS" : [],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/tests/test_qt_helpers_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/tests/test_qt_helpers_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"BIGSYM=1",
+		"BOOST_ALL_DYN_LINK",
+		"BOOST_ALL_NO_LIB",
+		"BOOST_ATOMIC_DYN_LINK",
+		"BOOST_CHRONO_DYN_LINK",
+		"BOOST_FILESYSTEM_DYN_LINK",
+		"BOOST_LOG_DYN_LINK",
+		"BOOST_REGEX_DYN_LINK",
+		"BOOST_THREAD_DYN_LINK",
+		"CMAKE_BUILD",
+		"QT5",
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NETWORK_LIB",
+		"QT_NO_DEBUG",
+		"QT_PRINTSUPPORT_LIB",
+		"QT_SQL_LIB",
+		"QT_TESTCASE_BUILDDIR=\"/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build\"",
+		"QT_TESTLIB_LIB",
+		"QT_WIDGETS_LIB",
+		"UDP_STATIC_DEFINE",
+		"UNIX"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/tests",
+		"/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx",
+		"/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/qcustomplot-source",
+		"/home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix/include",
+		"/usr/include/aarch64-linux-gnu/qt5",
+		"/usr/include/aarch64-linux-gnu/qt5/QtWidgets",
+		"/usr/include/aarch64-linux-gnu/qt5/QtGui",
+		"/usr/include/aarch64-linux-gnu/qt5/QtCore",
+		"/usr/lib/aarch64-linux-gnu/qt5/mkspecs/linux-g++",
+		"/usr/include/aarch64-linux-gnu/qt5/QtPrintSupport",
+		"/usr/include/aarch64-linux-gnu/qt5/QtNetwork",
+		"/usr/include/aarch64-linux-gnu/qt5/QtSql",
+		"/usr/include/aarch64-linux-gnu/qt5/QtTest",
+		"/usr/include",
+		"/usr/include/c++/10",
+		"/usr/include/aarch64-linux-gnu/c++/10",
+		"/usr/include/c++/10/backward",
+		"/usr/lib/gcc/aarch64-linux-gnu/10/include",
+		"/usr/local/include",
+		"/usr/include/aarch64-linux-gnu"
+	],
+	"MOC_MACRO_NAMES" : [ "Q_OBJECT", "Q_GADGET", "Q_NAMESPACE", "Q_NAMESPACE_EXPORT" ],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/c++",
+		"-dM",
+		"-E",
+		"-c",
+		"/usr/share/cmake-3.18/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/tests/test_qt_helpers_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 1,
+	"PARSE_CACHE_FILE" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/tests/CMakeFiles/test_qt_helpers_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/lib/qt5/bin/moc",
+	"QT_UIC_EXECUTABLE" : "",
+	"QT_VERSION_MAJOR" : 5,
+	"QT_VERSION_MINOR" : 15,
+	"SETTINGS_FILE" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/tests/CMakeFiles/test_qt_helpers_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/tests/test_qt_helpers.cpp",
+			"Mu"
+		]
+	],
+	"VERBOSITY" : 0
+}

@@ -1,0 +1,17 @@
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/source.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx_sources.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-install.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/hamlib-install.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/build.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/install.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/package.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/hamlib.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/hamlib_sources.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-configure.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/rebuild_cache.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/edit_cache.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/hamlib-update.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-update.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-build.dir
+/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-package.dir

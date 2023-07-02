@@ -1,0 +1,28 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-update"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-update.rule"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-update.rule"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-download.rule"
+		},
+		{
+			"file" : "/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-mkdir.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"wsjtx"
+		],
+		"name" : "wsjtx-update"
+	}
+}

@@ -1,0 +1,13 @@
+prefix=/home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Hamlib
+Description: Library to control radio and rotator equipment.
+URL: http://www.hamlib.org
+Version: 4.5.4
+Requires.private: libusb-1.0
+Cflags: -I${includedir} -pthread
+Libs: -L${libdir} -lhamlib
+Libs.private: -lm -ldl  

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libfort_qt.a CMakeFiles/fort_qt.dir/fort_qt_autogen/mocs_compilation.cpp.o CMakeFiles/fort_qt.dir/lib/shmem.cpp.o
+/usr/bin/ranlib libfort_qt.a

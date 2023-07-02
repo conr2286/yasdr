@@ -1,0 +1,11 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: wsjtx
+Upstream-Contact: Joe Taylor <k1jt@arrl.net>
+Source: https://wsjt.sourceforge.io/wsjtx.html
+
+Files: *
+Copyright: Copyright (C) 2001-2023 by Joe Taylor, K1JT.
+License: GPL-3+
+ On Debian systems, the full text of the GNU General Public
+ License version 3 can be found in the file
+ `/usr/share/common-licenses/GPL-3'.

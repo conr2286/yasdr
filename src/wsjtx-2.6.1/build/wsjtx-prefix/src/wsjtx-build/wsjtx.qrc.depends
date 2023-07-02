@@ -1,0 +1,57 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource>
+    <file alias="/icon_128x128.png">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/icons/Darwin/wsjtx.iconset/icon_128x128.png</file>
+    <file alias="/gpl-v3-logo.svg">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/contrib/gpl-v3-logo.svg</file>
+    <file alias="/splash.png">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/artwork/splash.png</file>
+    <file alias="/Palettes/Banana.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Banana.pal</file>
+    <file alias="/Palettes/Blue1.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Blue1.pal</file>
+    <file alias="/Palettes/Blue2.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Blue2.pal</file>
+    <file alias="/Palettes/Blue3.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Blue3.pal</file>
+    <file alias="/Palettes/Brown.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Brown.pal</file>
+    <file alias="/Palettes/Cyan1.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Cyan1.pal</file>
+    <file alias="/Palettes/Cyan2.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Cyan2.pal</file>
+    <file alias="/Palettes/Cyan3.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Cyan3.pal</file>
+    <file alias="/Palettes/Default.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Default.pal</file>
+    <file alias="/Palettes/Digipan.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Digipan.pal</file>
+    <file alias="/Palettes/Fldigi.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Fldigi.pal</file>
+    <file alias="/Palettes/Gray1.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Gray1.pal</file>
+    <file alias="/Palettes/Gray2.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Gray2.pal</file>
+    <file alias="/Palettes/Green1.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Green1.pal</file>
+    <file alias="/Palettes/Green2.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Green2.pal</file>
+    <file alias="/Palettes/Jungle.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Jungle.pal</file>
+    <file alias="/Palettes/Linrad.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Linrad.pal</file>
+    <file alias="/Palettes/Negative.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Negative.pal</file>
+    <file alias="/Palettes/Orange.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Orange.pal</file>
+    <file alias="/Palettes/Pink.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Pink.pal</file>
+    <file alias="/Palettes/Rainbow.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Rainbow.pal</file>
+    <file alias="/Palettes/Scope.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Scope.pal</file>
+    <file alias="/Palettes/Sunburst.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Sunburst.pal</file>
+    <file alias="/Palettes/VK4BDJ.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/VK4BDJ.pal</file>
+    <file alias="/Palettes/YL2KF.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/YL2KF.pal</file>
+    <file alias="/Palettes/Yellow1.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Yellow1.pal</file>
+    <file alias="/Palettes/Yellow2.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/Yellow2.pal</file>
+    <file alias="/Palettes/ZL1FZ.pal">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx/Palettes/ZL1FZ.pal</file>
+    <file alias="/Translations/qt_ca.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/qt_ca.qm</file>
+    <file alias="/Translations/qt_da.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/qt_da.qm</file>
+    <file alias="/Translations/qt_en.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/qt_en.qm</file>
+    <file alias="/Translations/qt_es.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/qt_es.qm</file>
+    <file alias="/Translations/qt_it.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/qt_it.qm</file>
+    <file alias="/Translations/qt_ja.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/qt_ja.qm</file>
+    <file alias="/Translations/qt_ru.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/qt_ru.qm</file>
+    <file alias="/Translations/qt_zh_TW.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/qt_zh_TW.qm</file>
+    <file alias="/Translations/qt_it.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/qt_it.qm</file>
+    <file alias="/Translations/wsjtx_ca.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_ca.qm</file>
+    <file alias="/Translations/wsjtx_da.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_da.qm</file>
+    <file alias="/Translations/wsjtx_en.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_en.qm</file>
+    <file alias="/Translations/wsjtx_en_GB.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_en_GB.qm</file>
+    <file alias="/Translations/wsjtx_es.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_es.qm</file>
+    <file alias="/Translations/wsjtx_it.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_it.qm</file>
+    <file alias="/Translations/wsjtx_ja.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_ja.qm</file>
+    <file alias="/Translations/wsjtx_ru.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_ru.qm</file>
+    <file alias="/Translations/wsjtx_zh.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_zh.qm</file>
+    <file alias="/Translations/wsjtx_zh_HK.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_zh_HK.qm</file>
+    <file alias="/Translations/wsjtx_zh_TW.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_zh_TW.qm</file>
+    <file alias="/Translations/wsjtx_it.qm">/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/wsjtx_it.qm</file>
+  </qresource>
+</RCC>

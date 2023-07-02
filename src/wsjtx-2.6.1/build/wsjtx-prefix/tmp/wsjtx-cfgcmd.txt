@@ -1,0 +1,1 @@
+cmd='/usr/bin/cmake;-DWSJT_GENERATE_DOCS=OFF;-DWSJT_SKIP_MANPAGES=ON;-DCMAKE_PREFIX_PATH=/home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix;-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>;-GUnix Makefiles;<SOURCE_DIR><SOURCE_SUBDIR>'
