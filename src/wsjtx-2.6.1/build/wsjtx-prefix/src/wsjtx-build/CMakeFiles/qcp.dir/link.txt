@@ -1,2 +1,0 @@
-/usr/bin/ar qc libqcp.a CMakeFiles/qcp.dir/qcp_autogen/mocs_compilation.cpp.o CMakeFiles/qcp.dir/qcustomplot-source/qcustomplot.cpp.o
-/usr/bin/ranlib libqcp.a

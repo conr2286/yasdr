@@ -1,3 +1,0 @@
-repository='external project URL'
-module='/home/pi/github/yasdr/src/wsjtx-2.6.1/src/wsjtx.tgz'
-tag='MD5=ce33ee79c685ab54f1682b140691fc57'

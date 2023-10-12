@@ -1,1 +1,0 @@
-/usr/bin/gfortran  -Wl,--gc-sections -O3 -DNDEBUG -O3 -fbounds-check -funroll-all-loops -fno-f2c -ffpe-summary=invalid,zero,overflow,underflow -Wall -Wno-conversion -fno-second-underscore CMakeFiles/test_snr.dir/lib/test_snr.f90.o -o test_snr  libwsjt_fort.a /usr/lib/aarch64-linux-gnu/libfftw3f_threads.so /usr/lib/aarch64-linux-gnu/libfftw3f.so 

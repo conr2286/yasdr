@@ -1,2 +1,0 @@
-/usr/bin/ar qc libwsjtx_udp.a CMakeFiles/wsjtx_udp-static.dir/wsjtx_udp-static_autogen/mocs_compilation.cpp.o CMakeFiles/wsjtx_udp-static.dir/Radio.cpp.o CMakeFiles/wsjtx_udp-static.dir/RadioMetaType.cpp.o CMakeFiles/wsjtx_udp-static.dir/Network/NetworkMessage.cpp.o CMakeFiles/wsjtx_udp-static.dir/UDPExamples/MessageServer.cpp.o
-/usr/bin/ranlib libwsjtx_udp.a

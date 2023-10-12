@@ -1,1 +1,0 @@
-/usr/bin/c++  -Werror -Wall -Wextra -fexceptions -frtti -Wno-pragmas -fopenmp --std=gnu++11 -pthread -O3 -DNDEBUG -fdata-sections -ffunction-sections CMakeFiles/VerifyFortranC.dir/main.c.o CMakeFiles/VerifyFortranC.dir/VerifyC.c.o CMakeFiles/VerifyFortranC.dir/VerifyCXX.cxx.o -o VerifyFortranC  libVerifyFortran.a -lgfortran 

@@ -1,2 +1,0 @@
-/usr/bin/ar qc libwsjt_qtmm.a CMakeFiles/wsjt_qtmm.dir/wsjt_qtmm_autogen/mocs_compilation.cpp.o CMakeFiles/wsjt_qtmm.dir/Audio/BWFFile.cpp.o
-/usr/bin/ranlib libwsjt_qtmm.a
