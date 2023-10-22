@@ -13,8 +13,9 @@
  * clock signal leads the other.
  *
  * The code attempts to minimize glitches in the SI5351a output arising from
- * parameter changes.  Other considerations optimize performance within the
+ * parameter changes.  Other considerations to ptimize performance within the
  * ITU HF amateur radio bands though operation elsewhere is not prohibited.
+ *
  * Lower frequency (i.e. MF and LF) operation has not been considered/tested
  * with yasdr and may require adjustments to the final divider programming.
  *
@@ -60,9 +61,9 @@
 
 #include "Pi2C.h"
 
-//Member variables for this SI5351a device located on this I2C bus
-Pi2C *i2c;				//This bus
-uint8_t addr;			//This device
+//Variables to address this SI5351a device located on this I2C bus
+Pi2C *i2c;				//The Raspberry Pi I2C bus hosting the SI5351a
+uint8_t addr;			//The SI5351a device address on that bus
 
 // SI5351 internal register definitions
 #define SI_DEVICE_STATUS 0
