@@ -1,3 +1,0 @@
-repository='external project URL'
-module='/home/pi/github/yasdr/src/wsjtx-2.6.1/src/hamlib-4.5.4.tar.gz'
-tag='MD5=ce40d510f6ac31d6e872335d925e9dff'

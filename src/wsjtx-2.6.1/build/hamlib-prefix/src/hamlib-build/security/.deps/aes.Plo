@@ -1,6 +1,0 @@
-aes.lo: \
- /home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix/src/hamlib/security/aes.c \
- /usr/include/stdc-predef.h \
- /home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix/src/hamlib/security/aes.h
-/usr/include/stdc-predef.h:
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix/src/hamlib/security/aes.h:

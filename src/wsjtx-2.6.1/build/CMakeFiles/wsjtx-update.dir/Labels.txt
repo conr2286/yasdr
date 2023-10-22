@@ -1,8 +1,0 @@
-# Target labels
- wsjtx
-# Source files and their labels
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-update
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/CMakeFiles/wsjtx-update.rule
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-update.rule
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-download.rule
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-stamp/wsjtx-mkdir.rule

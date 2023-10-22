@@ -1,5 +1,0 @@
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/CMakeFiles/FortranCInterface/CMakeFiles/rebuild_cache.dir
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/CMakeFiles/FortranCInterface/CMakeFiles/FortranCInterface.dir
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/CMakeFiles/FortranCInterface/CMakeFiles/symbols.dir
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/CMakeFiles/FortranCInterface/CMakeFiles/edit_cache.dir
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/wsjtx-prefix/src/wsjtx-build/CMakeFiles/FortranCInterface/CMakeFiles/myfort.dir

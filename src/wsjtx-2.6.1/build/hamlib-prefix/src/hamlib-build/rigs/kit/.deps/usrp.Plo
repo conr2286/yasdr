@@ -1,6 +1,0 @@
-usrp.lo: \
- /home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix/src/hamlib/rigs/kit/usrp.c \
- /usr/include/stdc-predef.h \
- /home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix/src/hamlib/include/hamlib/config.h
-/usr/include/stdc-predef.h:
-/home/pi/github/yasdr/src/wsjtx-2.6.1/build/hamlib-prefix/src/hamlib/include/hamlib/config.h:
