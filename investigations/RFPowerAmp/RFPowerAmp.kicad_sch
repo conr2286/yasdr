@@ -1,0 +1,82 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid 4eeb911c-75f4-4119-b54f-fc9266b9abf0)
+
+  (paper "A4")
+
+  (lib_symbols
+  )
+
+
+  (sheet (at 172.72 82.55) (size 100.33 49.53) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd)
+    (property "Sheetname" "FDC8602" (at 172.72 81.8384 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "FDC8602.kicad_sch" (at 172.72 132.6646 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "RFPowerAmp"
+        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0" (page "5"))
+      )
+    )
+  )
+
+  (sheet (at 20.32 81.28) (size 100.33 49.53) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 86dacbc1-7328-4d68-a450-65c4e3f9befd)
+    (property "Sheetname" "FDT86256" (at 20.32 80.5684 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "FDT86256.kicad_sch" (at 20.32 131.3946 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "RFPowerAmp"
+        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0" (page "4"))
+      )
+    )
+  )
+
+  (sheet (at 20.32 22.86) (size 100.33 48.26) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid a2817ae9-94f7-402a-9f05-6ccca944baee)
+    (property "Sheetname" "IRF510" (at 20.32 22.1484 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "IRF510.kicad_sch" (at 20.32 71.7046 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "RFPowerAmp"
+        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0" (page "2"))
+      )
+    )
+  )
+
+  (sheet (at 172.72 22.86) (size 100.33 48.26) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid c5c7dfab-f186-4bc2-9900-1a2e1f7b9b94)
+    (property "Sheetname" "LowPassFilter" (at 172.72 22.1484 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "20MeterLowPassFilter.kicad_sch" (at 172.72 71.7046 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "RFPowerAmp"
+        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0" (page "3"))
+      )
+    )
+  )
+
+  (sheet_instances
+    (path "/" (page "1"))
+  )
+)
