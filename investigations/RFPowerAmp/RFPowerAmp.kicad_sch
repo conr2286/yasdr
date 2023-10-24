@@ -8,6 +8,23 @@
   )
 
 
+  (sheet (at 20.32 139.7) (size 101.6 50.8) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid 204ca3ab-d207-410f-930a-76704dfa57fb)
+    (property "Sheetname" "PowerAndVFO" (at 20.32 138.9884 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "PowerAndVFO.kicad_sch" (at 20.32 191.0846 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "RFPowerAmp"
+        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0" (page "6"))
+      )
+    )
+  )
+
   (sheet (at 172.72 82.55) (size 100.33 49.53) (fields_autoplaced)
     (stroke (width 0.1524) (type solid))
     (fill (color 0 0 0 0.0000))
