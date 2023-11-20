@@ -1,7 +1,7 @@
 
 simulations/ssb_lsb_256k_complex2.dat
-.DS_Store
-.o
+*.DS_Store
+*.o
 .cproject
 .settings
 .DS_Store
