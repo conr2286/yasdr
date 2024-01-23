@@ -743,7 +743,7 @@
   (symbol (lib_id "SparkFun-Connectors:CONN_20") (at 34.29 137.16 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3b842eb9-7c94-48e8-83b8-31c2002ebc7d)
-    (property "Reference" "J504" (at 27.94 158.75 0)
+    (property "Reference" "J1" (at 27.94 158.75 0)
       (effects (font (size 1.143 1.143)) (justify right))
     )
     (property "Value" "CONN_20" (at 27.94 161.29 0)
@@ -780,9 +780,6 @@
     (pin "9" (uuid c05eedb9-9574-4a8c-8cdb-a9a72ef0005a))
     (instances
       (project "RFPowerAmp"
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd"
-          (reference "J504") (unit 1)
-        )
         (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/204ca3ab-d207-410f-930a-76704dfa57fb"
           (reference "J1") (unit 1)
         )
@@ -793,7 +790,7 @@
   (symbol (lib_id "Device:C") (at 83.82 153.67 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 5101b6e0-e4de-46e6-8248-ed6e99ac6bd3)
-    (property "Reference" "C?" (at 80.01 151.13 0)
+    (property "Reference" "C602" (at 80.01 151.13 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "220 nF" (at 80.01 153.67 0)
@@ -812,15 +809,6 @@
     (pin "2" (uuid efe0814f-e237-438c-b637-c33890d97267))
     (instances
       (project "RFPowerAmp"
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0"
-          (reference "C?") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/a2817ae9-94f7-402a-9f05-6ccca944baee"
-          (reference "C3") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd"
-          (reference "C2") (unit 1)
-        )
         (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/204ca3ab-d207-410f-930a-76704dfa57fb"
           (reference "C602") (unit 1)
         )
@@ -836,7 +824,7 @@
   (symbol (lib_id "power:GND") (at 39.37 187.96 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5c28fc20-9a48-4c4c-a0f6-db540ce7ea9a)
-    (property "Reference" "#PWR04" (at 39.37 194.31 0)
+    (property "Reference" "#PWR026" (at 39.37 194.31 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 39.37 193.04 0)
@@ -851,9 +839,6 @@
     (pin "1" (uuid e9b8c1fa-89a2-48ec-b6e5-c8c0c1886338))
     (instances
       (project "RFPowerAmp"
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd"
-          (reference "#PWR04") (unit 1)
-        )
         (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/204ca3ab-d207-410f-930a-76704dfa57fb"
           (reference "#PWR026") (unit 1)
         )
@@ -864,7 +849,7 @@
   (symbol (lib_id "power:GND") (at 83.82 157.48 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 689fc891-c8a0-4601-80dd-c2e89313447b)
-    (property "Reference" "#PWR?" (at 83.82 163.83 0)
+    (property "Reference" "#PWR022" (at 83.82 163.83 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 83.82 162.56 0)
@@ -879,15 +864,6 @@
     (pin "1" (uuid bcfc9b99-8bdd-435c-82c5-ebf561243697))
     (instances
       (project "RFPowerAmp"
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0"
-          (reference "#PWR?") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/a2817ae9-94f7-402a-9f05-6ccca944baee"
-          (reference "#PWR05") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd"
-          (reference "#PWR05") (unit 1)
-        )
         (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/204ca3ab-d207-410f-930a-76704dfa57fb"
           (reference "#PWR022") (unit 1)
         )
@@ -928,7 +904,7 @@
   (symbol (lib_id "power:PWR_FLAG") (at 96.52 147.32 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 770f76f5-82b0-4f2a-9038-27d88e7caaf4)
-    (property "Reference" "#FLG?" (at 96.52 145.415 0)
+    (property "Reference" "#FLG03" (at 96.52 145.415 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "PWR_FLAG" (at 96.52 142.24 0)
@@ -943,15 +919,6 @@
     (pin "1" (uuid 247f1706-57a2-4dbd-ade6-f1b34ea8c3a9))
     (instances
       (project "RFPowerAmp"
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0"
-          (reference "#FLG?") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/a2817ae9-94f7-402a-9f05-6ccca944baee"
-          (reference "#FLG01") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd"
-          (reference "#FLG01") (unit 1)
-        )
         (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/204ca3ab-d207-410f-930a-76704dfa57fb"
           (reference "#FLG03") (unit 1)
         )
@@ -967,7 +934,7 @@
   (symbol (lib_id "dk_PMIC-Voltage-Regulators-Linear:L7805CV") (at 64.77 147.32 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 7b065895-4edd-4dd5-aa4d-940965f44d02)
-    (property "Reference" "U?" (at 63.5 139.7 0)
+    (property "Reference" "U601" (at 63.5 139.7 0)
       (effects (font (size 1.524 1.524)))
     )
     (property "Value" "L7805CV" (at 64.77 142.24 0)
@@ -1011,12 +978,6 @@
     (pin "3" (uuid 6b310364-1d84-4122-b9f8-42ec5a62c8c2))
     (instances
       (project "RFPowerAmp"
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0"
-          (reference "U?") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd"
-          (reference "U502") (unit 1)
-        )
         (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/204ca3ab-d207-410f-930a-76704dfa57fb"
           (reference "U601") (unit 1)
         )
@@ -1027,7 +988,7 @@
   (symbol (lib_id "power:PWR_FLAG") (at 96.52 157.48 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 7cb0b237-02a7-4e10-ac5f-7596faef64e6)
-    (property "Reference" "#FLG?" (at 96.52 159.385 0)
+    (property "Reference" "#FLG04" (at 96.52 159.385 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "PWR_FLAG" (at 96.52 162.56 0)
@@ -1042,15 +1003,6 @@
     (pin "1" (uuid 7552a448-ce9f-400c-88c0-1d44678c5262))
     (instances
       (project "RFPowerAmp"
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0"
-          (reference "#FLG?") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/a2817ae9-94f7-402a-9f05-6ccca944baee"
-          (reference "#FLG02") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd"
-          (reference "#FLG02") (unit 1)
-        )
         (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/204ca3ab-d207-410f-930a-76704dfa57fb"
           (reference "#FLG04") (unit 1)
         )
@@ -1095,7 +1047,7 @@
   (symbol (lib_id "Device:C") (at 54.61 121.92 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8e2b9700-ef4d-4536-92f7-096a310a6f2f)
-    (property "Reference" "C?" (at 50.8 120.65 0)
+    (property "Reference" "C604" (at 50.8 120.65 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "1 uF" (at 50.8 123.19 0)
@@ -1114,18 +1066,6 @@
     (pin "2" (uuid 945b4a17-24b6-4054-8b2c-15204dac3aaf))
     (instances
       (project "RFPowerAmp"
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0"
-          (reference "C?") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/a2817ae9-94f7-402a-9f05-6ccca944baee"
-          (reference "C202") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/86dacbc1-7328-4d68-a450-65c4e3f9befd"
-          (reference "C402") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd"
-          (reference "C502") (unit 1)
-        )
         (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/204ca3ab-d207-410f-930a-76704dfa57fb"
           (reference "C604") (unit 1)
         )
@@ -1141,7 +1081,7 @@
   (symbol (lib_id "Device:C_Polarized") (at 96.52 153.67 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid bda2940c-9903-4a21-b384-83f92f1a1855)
-    (property "Reference" "C?" (at 100.33 151.511 0)
+    (property "Reference" "C603" (at 100.33 151.511 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "10 uF" (at 100.33 154.051 0)
@@ -1157,15 +1097,6 @@
     (pin "2" (uuid 6ada6d36-2a64-4bf4-af9e-ee6371d441c0))
     (instances
       (project "RFPowerAmp"
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0"
-          (reference "C?") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/a2817ae9-94f7-402a-9f05-6ccca944baee"
-          (reference "C201") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd"
-          (reference "C1") (unit 1)
-        )
         (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/204ca3ab-d207-410f-930a-76704dfa57fb"
           (reference "C603") (unit 1)
         )
@@ -1181,7 +1112,7 @@
   (symbol (lib_id "Device:C") (at 46.99 153.67 0) (mirror y) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid c5c25188-d329-486c-b29c-9ab36d2a8f54)
-    (property "Reference" "C?" (at 50.8 152.4 0)
+    (property "Reference" "C601" (at 50.8 152.4 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "100 nF" (at 50.8 154.94 0)
@@ -1200,12 +1131,6 @@
     (pin "2" (uuid 86540861-b656-4d55-9dd0-8a82e8e7edf7))
     (instances
       (project "RFPowerAmp"
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0"
-          (reference "C?") (unit 1)
-        )
-        (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/7475b1bb-dd5f-4ae3-b5b4-dfd759e764bd"
-          (reference "C3") (unit 1)
-        )
         (path "/4eeb911c-75f4-4119-b54f-fc9266b9abf0/204ca3ab-d207-410f-930a-76704dfa57fb"
           (reference "C601") (unit 1)
         )
