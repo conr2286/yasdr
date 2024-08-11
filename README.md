@@ -16,7 +16,9 @@ YASDR is a software-defined radio transceiver for FSK (Frequency Shift Keying) a
  * Using Raspberry Pi hardware and an existing commercial transceiver, replace the off-the-shelf wsjt-x binaries with built-from-source binaries 
  * Replace the commercial transceiver with homebrew SDR front-end delivering IQ signals to a derivative of wsjt-x modified to decode IQ audio from the stereo CODEC
  * Implement support for CW in wsjt-x and key-shaping in the Class E PA
+ * The SI5351 code works quite well for quadrature
  
  ## Status
 04/07/2023 investigations/SI5351V2 code generates quadrature signals
+08/11/2024 pivoting to an implementation based upon Pocket FT8 to save power.
 
